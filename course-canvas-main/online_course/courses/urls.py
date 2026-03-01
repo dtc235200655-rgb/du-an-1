@@ -27,6 +27,9 @@ urlpatterns = [
     # Hủy đăng ký
     path('enrollment/<int:pk>/cancel/', views.cancel_enrollment, name='cancel_enrollment'),
     
-    
+    # Quản lý khóa học
+    path('create/', views.create_course, name='create_course'),
+    path('<int:pk>/edit/', views.edit_course, name='edit_course'),
+    path('<int:pk>/delete/', views.delete_course, name='delete_course'),
     
 ]

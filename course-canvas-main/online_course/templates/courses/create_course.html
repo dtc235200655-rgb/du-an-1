@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+
+{% block title %}Tạo khóa học mới - Online Courses{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-container {
+        max-width: 800px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+    }
+    .image-preview {
+        max-width: 100%;
+        max-height: 300px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .help-text {
+        font-size: 0.875rem;
+        color: #6c757d;
+        margin-top: 0.25rem;
+    }
+    .file-input-wrapper {
+        position: relative;
+        overflow: hidden;
+        display: inline-block;
+        cursor: pointer;
+    }
+    .file-input-wrapper input[type=file] {
+        position: absolute;
+        left: 0;
+        top: 0;
+        opacity: 0;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">
+                <i class="bi bi-plus-circle me-2"></i>Tạo khóa học mới
+            </h3>
+        </div>
+        <div class="card-body">
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                    {% for error in form.non_field_errors %}
+                        <div>{{ error }}</div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                <div class="row">
+                    <div class="col-md-8">
+                        <!-- Tiêu đề -->
+                        <div class="mb-3">
+                            <label for="{{ form.title.id_for_label }}" class="form-label required">
+                                Tiêu đề khóa học
+                            </label>
+                            {{ form.title }}
+                            {% if form.title.errors %}
+                                <div class="text-danger mt-1">
+                                    {% for error in form.title.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="help-text">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Nhập tiêu đề hấp dẫn và mô tả rõ ràng nội dung khóa học
+                            </div>
+                        </div>
+                        
+                        <!-- Danh mục -->
+                        <div class="mb-3">
+                            <label for="{{ form.category.id_for_label }}" class="form-label">
+                                Danh mục
+                            </label>
+                            {{ form.category }}
+                            {% if form.category.errors %}
+                                <div class="text-danger mt-1">
+                                    {% for error in form.category.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="help-text">
+                                <i class="bi bi-tag me-1"></i>
+                                Chọn danh mục phù hợp để người học dễ tìm thấy
+                            </div>
+                        </div>
+                        
+                        <!-- Giá -->
+                        <div class="mb-3">
+                            <label for="{{ form.price.id_for_label }}" class="form-label required">
+                                Giá khóa học (VNĐ)
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text">₫</span>
+                                {{ form.price }}
+                            </div>
+                            {% if form.price.errors %}
+                                <div class="text-danger mt-1">
+                                    {% for error in form.price.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="help-text">
+                                <i class="bi bi-currency-dollar me-1"></i>
+                                Nhập 0 nếu khóa học miễn phí. Giá phải là số nguyên dương.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <!-- Ảnh đại diện -->
+                        <div class="mb-3">
+                            <label for="{{ form.image.id_for_label }}" class="form-label required">
+                                Ảnh đại diện
+                            </label>
+                            <div class="border rounded p-3 text-center">
+                                <div id="image-preview-container" class="mb-3" style="display: none;">
+                                    <img id="image-preview" class="image-preview mb-2">
+                                </div>
+                                <div class="file-input-wrapper">
+                                    <button type="button" class="btn btn-outline-primary">
+                                        <i class="bi bi-image me-1"></i>Chọn ảnh
+                                    </button>
+                                    {{ form.image }}
+                                </div>
+                                <div class="mt-2">
+                                    <small class="text-muted">Click để chọn ảnh từ máy tính</small>
+                                </div>
+                            </div>
+                            {% if form.image.errors %}
+                                <div class="text-danger mt-1">
+                                    {% for error in form.image.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="help-text">
+                                <i class="bi bi-file-image me-1"></i>
+                                {{ form.image.help_text }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Mô tả -->
+                <div class="mb-4">
+                    <label for="{{ form.description.id_for_label }}" class="form-label required">
+                        Mô tả chi tiết
+                    </label>
+                    {{ form.description }}
+                    {% if form.description.errors %}
+                        <div class="text-danger mt-1">
+                            {% for error in form.description.errors %}
+                                <small>{{ error }}</small>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    <div class="help-text">
+                        <i class="bi bi-text-left me-1"></i>
+                        Mô tả đầy đủ nội dung, mục tiêu, và những gì học viên sẽ đạt được
+                    </div>
+                </div>
+                
+                <!-- Nút hành động -->
+                <div class="d-flex justify-content-between">
+                    <a href="{% url 'courses:dashboard' %}" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left me-1"></i>Hủy
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-circle me-1"></i>Tạo khóa học
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Image preview functionality
+document.getElementById("id_image").addEventListener("change", function() {
+    const file = this.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const preview = document.getElementById("image-preview");
+            preview.src = e.target.result;
+            document.getElementById("image-preview-container").style.display = "block";
+        };
+        reader.readAsDataURL(file);
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Xóa khóa học - {{ course.title }} - Online Courses{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h3 class="mb-0">
+                        <i class="bi bi-exclamation-triangle me-2"></i>Xác nhận xóa khóa học
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-circle me-2"></i>
+                        <strong>Cảnh báo:</strong> Hành động này không thể hoàn tác!
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h5 class="mb-3">Bạn đang muốn xóa khóa học:</h5>
+                        <div class="border rounded p-3 bg-light">
+                            <h4 class="text-danger">{{ course.title }}</h4>
+                            <p class="mb-2"><strong>Mô tả:</strong> {{ course.description|truncatewords:30 }}</p>
+                            <p class="mb-1"><strong>Giá:</strong> {{ course.price|floatformat:0 }} VNĐ</p>
+                            <p class="mb-0"><strong>Trạng thái:</strong> 
+                                <span class="badge bg-{{ course.get_status_display_badge }}">
+                                    {{ course.get_status_display }}
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <h6><i class="bi bi-info-circle me-1"></i>Thông tin ảnh hưởng:</h6>
+                        <ul class="mb-0">
+                            <li>Tất cả đăng ký học của khóa học này sẽ bị xóa</li>
+                            <li>Tất cả đánh giá và nhận xét sẽ bị xóa</li>
+                            <li>Ảnh minh họa sẽ bị xóa khỏi hệ thống</li>
+                            <li>Khóa học sẽ không thể khôi phục</li>
+                        </ul>
+                    </div>
+                    
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% url 'courses:edit_course' course.pk %}" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left me-1"></i>Hủy bỏ
+                            </a>
+                            <button type="submit" class="btn btn-danger" 
+                                    onclick="return confirm('Bạn có chắc chắn muốn xóa khóa học này? Hành động này không thể hoàn tác!')">
+                                <i class="bi bi-trash me-1"></i>Xóa vĩnh viễn
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

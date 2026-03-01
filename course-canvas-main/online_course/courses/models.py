@@ -177,8 +177,16 @@ class Review(models.Model):
     )
 
     comment = models.TextField(verbose_name="Nhận xét")
+    
+    #✅ ẢNH ĐÍNH KÈM ĐÁNH GIÁ
+    image = models.ImageField(
+        upload_to='reviews/',
+        blank=True,
+        null=True,
+        verbose_name="Ảnh đính kèm"
+    )
 
-    # ✅ ADMIN CÓ THỂ PHẢN HỒI
+    #✅ ADMIN CÓ THỂ PHẢN HỒI
     admin_reply = models.TextField(
         blank=True,
         null=True,

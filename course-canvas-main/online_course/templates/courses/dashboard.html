@@ -168,10 +168,108 @@
                 <a href="/courses/my-courses/" class="btn btn-outline-primary quick-action-btn">
                     <i class="bi bi-book me-2"></i>Khóa học của tôi
                 </a>
+                <a href="{% url 'courses:create_course' %}" class="btn btn-success quick-action-btn">
+                    <i class="bi bi-plus-circle me-2"></i>Tạo khóa học
+                </a>
                 <a href="#" class="btn btn-outline-secondary quick-action-btn">
                     <i class="bi bi-gear me-2"></i>Cài đặt tài khoản
                 </a>
             </div>
+        </div>
+    </div>
+
+    <!-- ========== MY CREATED COURSES SECTION ========== -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <h4 class="mb-0"><i class="bi bi-file-earmark-plus me-2"></i>Khóa học tôi tạo</h4>
+                <a href="{% url 'courses:create_course' %}" class="btn btn-sm btn-success">
+                    <i class="bi bi-plus-circle me-1"></i>Tạo mới
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            {% with my_courses=request.user.courses.all %}
+            {% if my_courses %}
+            <div class="row g-3">
+                {% for course in my_courses|slice:":6" %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card course-card h-100 shadow-sm">
+                        <!-- Course Image -->
+                        {% if course.image %}
+                        <img src="{{ course.image.url }}" 
+                             class="card-img-top" 
+                             style="height: 150px; object-fit: cover;" 
+                             alt="{{ course.title }}">
+                        {% else %}
+                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center" 
+                             style="height: 150px;">
+                            <i class="bi bi-image text-muted" style="font-size: 2rem;"></i>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="card-body d-flex flex-column">
+                            <!-- Course Title -->
+                            <h6 class="card-title fw-bold mb-2">{{ course.title }}</h6>
+                            
+                            <!-- Status Badge -->
+                            <div class="mb-2">
+                                {% if course.status == 'draft' %}
+                                <span class="badge bg-secondary">Nháp</span>
+                                {% elif course.status == 'pending' %}
+                                <span class="badge bg-warning text-dark">Chờ duyệt</span>
+                                {% elif course.status == 'approved' %}
+                                <span class="badge bg-success">Đã duyệt</span>
+                                {% elif course.status == 'rejected' %}
+                                <span class="badge bg-danger">Từ chối</span>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Stats -->
+                            <div class="small text-muted mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <span><i class="bi bi-person me-1"></i>{{ course.enrollments.count }} đăng ký</span>
+                                </div>
+                                <div class="d-flex justify-content-between mt-1">
+                                    <span><i class="bi bi-star me-1"></i>{{ course.average_rating|default:"0.0" }} ({{ course.reviews.count }})</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Price -->
+                            <div class="mt-auto">
+                                <span class="fw-bold text-primary">{{ course.price|floatformat:0 }} đ</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div class="card-footer bg-transparent border-0 pt-0 pb-3">
+                            <div class="d-grid gap-2">
+                                <a href="{% url 'courses:edit_course' course.pk %}" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-pencil me-1"></i>Sửa
+                                </a>
+                                {% if course.status != 'approved' %}
+                                <a href="{% url 'courses:course_detail' course.pk %}" class="btn btn-sm btn-outline-secondary">
+                                    <i class="bi bi-eye me-1"></i>Xem
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <!-- Empty State -->
+            <div class="text-center py-4">
+                <i class="bi bi-file-earmark-plus display-3 text-muted mb-3"></i>
+                <h5 class="text-muted mb-2">Bạn chưa tạo khóa học nào</h5>
+                <p class="text-muted mb-3">Hãy chia sẻ kiến thức của bạn bằng cách tạo khóa học đầu tiên!</p>
+                <a href="{% url 'courses:create_course' %}" class="btn btn-success">
+                    <i class="bi bi-plus-circle me-2"></i>Tạo khóa học đầu tiên
+                </a>
+            </div>
+            {% endif %}
+            {% endwith %}
         </div>
     </div>
 

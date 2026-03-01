@@ -4,6 +4,7 @@ from django.utils import timezone
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 from .models import Category, Course, Enrollment, Review
+from .forms import CourseAdminForm, EnrollmentAdminForm, ReviewAdminForm
 
 
 @admin.register(Category)
@@ -46,6 +47,8 @@ class CategoryAdmin(admin.ModelAdmin):
 @admin.register(Course)
 class CourseAdmin(admin.ModelAdmin):
     """Admin cho Khóa học - Có đầy đủ chức năng duyệt"""
+    form = CourseAdminForm
+    
     list_display = [
         'title', 
         'category', 
@@ -229,6 +232,8 @@ class CourseAdmin(admin.ModelAdmin):
 @admin.register(Enrollment)
 class EnrollmentAdmin(admin.ModelAdmin):
     """Admin cho Đăng ký học - Quản lý và duyệt đăng ký"""
+    form = EnrollmentAdminForm
+    
     list_display = [
         'id',
         'user_info',
@@ -433,10 +438,49 @@ class EnrollmentAdmin(admin.ModelAdmin):
 
 @admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
-    list_display = ('user', 'course', 'rating', 'is_visible', 'created_at')
+    form = ReviewAdminForm
+    list_display = ('user', 'course', 'rating', 'has_image', 'is_visible', 'created_at')
     list_filter = ('course', 'rating', 'is_visible')
     search_fields = ('user__username', 'course__title')
     ordering = ('-created_at',)
+    readonly_fields = ('created_at', 'image_preview')
+    
+    fieldsets = (
+        ('Thông tin đánh giá', {
+            'fields': ('user', 'course', 'rating', 'comment')
+        }),
+        ('Ảnh đính kèm', {
+            'fields': ('image', 'image_preview'),
+            'description': 'Ảnh minh họa cho đánh giá (tùy chọn)'
+        }),
+        ('Quản lý', {
+            'fields': ('admin_reply', 'is_visible')
+        }),
+        ('Thông tin hệ thống', {
+            'fields': ('created_at',),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    def has_image(self, obj):
+        """Hiển thị icon nếu có ảnh"""
+        if obj.image:
+            return '✅'
+        return '❌'
+    has_image.short_description = 'Có ảnh'
+    
+    def image_preview(self, obj):
+        """Xem trước ảnh đính kèm"""
+        if obj.image:
+            return format_html(
+                '<a href="{}" target="_blank">'
+                '<img src="{}" style="max-width: 200px; max-height: 200px; border-radius: 8px; border: 1px solid #ddd;" />'
+                '</a>',
+                obj.image.url,
+                obj.image.url
+            )
+        return format_html('<span style="color: #999;">Không có ảnh</span>')
+    image_preview.short_description = 'Xem trước ảnh'
 
 # ========== TÙY CHỈNH DJANGO ADMIN SITE ==========
 

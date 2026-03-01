@@ -1,19 +1,102 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.db.models import Avg
-from .models import Course, Enrollment, Review
+from django.db.models import Avg, Count, Q
+from django.core.paginator import Paginator
+from .models import Course, Enrollment, Review, Category
+from .forms import CourseCreateForm, CourseUpdateForm
+from .utils import validate_image_file
 
 
 def home(request):
     return render(request, 'index.html')
 
 
+from django.db.models import Q   # thêm dòng này ở đầu file nếu chưa có
+
 def courses(request):
-    course_list = Course.objects.filter(status='approved').order_by('-created_at')
-    return render(request, 'courses/courses.html', {
-        'courses': course_list
-    })
+    # ===== LẤY CÁC THAM SỐ TÌM KIẾM =====
+    query = request.GET.get('q', '').strip()
+    sort = request.GET.get('sort', '')
+    category_id = request.GET.get('category', '')
+    price_min = request.GET.get('price_min', '')
+    price_max = request.GET.get('price_max', '')
+    
+    # ===== BASE QUERYSET =====
+    course_list = Course.objects.filter(status='approved').select_related('category', 'created_by')
+    
+    # ===== TÌM KIẾM =====
+    if query:
+        course_list = course_list.filter(
+            Q(title__icontains=query) |
+            Q(description__icontains=query) |
+            Q(created_by__username__icontains=query)
+        )
+    
+    # ===== LỌC THEO DANH MỤC =====
+    if category_id:
+        try:
+            category_id = int(category_id)
+            course_list = course_list.filter(category_id=category_id)
+        except (ValueError, TypeError):
+            pass
+    
+    # ===== LỌC THEO GIÁ =====
+    if price_min:
+        try:
+            course_list = course_list.filter(price__gte=float(price_min))
+        except (ValueError, TypeError):
+            pass
+    
+    if price_max:
+        try:
+            course_list = course_list.filter(price__lte=float(price_max))
+        except (ValueError, TypeError):
+            pass
+    
+    # ===== SẮP XẾP =====
+    sort_options = {
+        'newest': '-created_at',
+        'oldest': 'created_at',
+        'price_low': 'price',
+        'price_high': '-price',
+        'title_a': 'title',
+        'title_z': '-title',
+        'popular': '-enrollments__count'  # Sẽ annotate sau
+    }
+    
+    if sort in sort_options:
+        if sort == 'popular':
+            course_list = course_list.annotate(
+                enrollment_count=Count('enrollments', filter=Q(enrollments__status='approved'))
+            ).order_by('-enrollment_count')
+        else:
+            course_list = course_list.order_by(sort_options[sort])
+    else:
+        course_list = course_list.order_by('-created_at')
+    
+    # ===== PHÂN TRANG =====
+    paginator = Paginator(course_list, 9)  # 9 khóa học mỗi trang
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    # ===== LẤY DANH MỤC CHO BỘ LỌC =====
+    categories = Category.objects.filter(is_active=True, courses__status='approved').distinct()
+    
+    context = {
+        'courses': page_obj,
+        'categories': categories,
+        'query': query,
+        'sort': sort,
+        'category_id': int(category_id) if category_id else None,
+        'price_min': price_min,
+        'price_max': price_max,
+        'sort_options': sort_options,
+        'paginator': paginator,
+        'page_obj': page_obj,
+    }
+    
+    return render(request, 'courses/courses.html', context)
 
 
 def course_detail(request, pk):
@@ -65,23 +148,36 @@ def add_review(request, pk):
         pk=pk,
         status='approved'
     )
-
     
-
     if request.method == "POST":
         rating = request.POST.get("rating")
         comment = request.POST.get("comment")
-
-        Review.objects.update_or_create(
+        image = request.FILES.get("image")
+        
+        # Validate ảnh nếu có
+        if image:
+            from .utils import validate_review_image
+            errors = validate_review_image(image)
+            if errors:
+                for error in errors:
+                    messages.error(request, error)
+                return redirect('courses:course_detail', pk=pk)
+        
+        # Tạo hoặc cập nhật đánh giá
+        review, created = Review.objects.update_or_create(
             user=request.user,
             course=course,
             defaults={
                 'rating': rating,
-                'comment': comment
+                'comment': comment,
+                'image': image if image else None
             }
         )
-
-        messages.success(request, "Đánh giá của bạn đã được gửi!")
+        
+        if created:
+            messages.success(request, "Đánh giá của bạn đã được gửi!")
+        else:
+            messages.success(request, "Đánh giá của bạn đã được cập nhật!")
 
     return redirect('courses:course_detail', pk=pk)
 
@@ -192,3 +288,80 @@ def dashboard(request):
         'rejected_count': rejected_count,
         'cancelled_count': cancelled_count,
     })
+
+
+# =========== COURSE MANAGEMENT VIEWS ===========
+
+@login_required
+def create_course(request):
+    """Tạo khóa học mới với validation file upload"""
+    if request.method == 'POST':
+        form = CourseCreateForm(request.POST, request.FILES, user=request.user)
+        
+        if form.is_valid():
+            # Kiểm tra thêm file upload
+            image = request.FILES.get('image')
+            if image:
+                errors = validate_image_file(image)
+                if errors:
+                    for error in errors:
+                        messages.error(request, error)
+                    return render(request, 'courses/create_course.html', {'form': form})
+            
+            course = form.save()
+            messages.success(request, f'Khóa học "{course.title}" đã được tạo thành công! Chờ admin duyệt.')
+            return redirect('courses:dashboard')
+        else:
+            # Hiển thị lỗi form
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f'{field}: {error}')
+    else:
+        form = CourseCreateForm()
+    
+    return render(request, 'courses/create_course.html', {'form': form})
+
+
+@login_required
+def edit_course(request, pk):
+    """Sửa khóa học với validation file upload"""
+    course = get_object_or_404(Course, pk=pk, created_by=request.user)
+    
+    if request.method == 'POST':
+        form = CourseUpdateForm(request.POST, request.FILES, instance=course, user=request.user)
+        
+        if form.is_valid():
+            # Kiểm tra file upload nếu có
+            image = request.FILES.get('image')
+            if image:
+                errors = validate_image_file(image)
+                if errors:
+                    for error in errors:
+                        messages.error(request, error)
+                    return render(request, 'courses/edit_course.html', {'form': form, 'course': course})
+            
+            course = form.save()
+            messages.success(request, f'Khóa học "{course.title}" đã được cập nhật!')
+            return redirect('courses:dashboard')
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f'{field}: {error}')
+    else:
+        form = CourseUpdateForm(instance=course)
+    
+    return render(request, 'courses/edit_course.html', {'form': form, 'course': course})
+
+
+@login_required
+def delete_course(request, pk):
+    """Xóa khóa học (chỉ người tạo)"""
+    course = get_object_or_404(Course, pk=pk, created_by=request.user)
+    
+    if request.method == 'POST':
+        title = course.title
+        course.delete()
+        messages.success(request, f'Khóa học "{title}" đã được xóa thành công!')
+        return redirect('courses:dashboard')
+    
+    return render(request, 'courses/delete_course.html', {'course': course})

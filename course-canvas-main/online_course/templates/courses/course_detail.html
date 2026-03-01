@@ -403,7 +403,20 @@
         </small>
 
         <p style="margin-top:8px;">{{ review.comment }}</p>
-
+        
+        <!--🔥 ẢNH ĐÍNH KÈM ĐÁNH GIÁ -->
+        {% if review.image %}
+        <div style="margin-top:12px;">
+            <div style="border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;display:inline-block;">
+                <a href="{{ review.image.url }}" target="_blank" style="display:block;">
+                    <img src="{{ review.image.url }}" 
+                         style="max-width:200px;max-height:200px;object-fit:cover;" 
+                         alt="Ảnh đính kèm đánh giá">
+                </a>
+            </div>
+        </div>
+        {% endif %}
+        
         <!-- 🔥 PHẦN ADMIN REPLY -->
         {% if review.admin_reply %}
         <div style="
@@ -424,12 +437,12 @@
                     <hr>
 
                     <!-- FORM REVIEW -->
-                    <form method="POST" action="{% url 'courses:add_review' course.pk %}">
+                    <form method="POST" action="{% url 'courses:add_review' course.pk %}" enctype="multipart/form-data">
                         {% csrf_token %}
                         <label>Đánh giá sao:</label>
                         <select name="rating" required class="form-control mb-2">
                             <option value="">Chọn sao</option>
-                            <option value="5">5 ⭐</option>
+                            <option value="5">5⭐</option>
                             <option value="4">4 ⭐</option>
                             <option value="3">3 ⭐</option>
                             <option value="2">2 ⭐</option>
@@ -437,6 +450,19 @@
                         </select>
                         <textarea name="comment" class="form-control mb-2"
                                   placeholder="Viết nhận xét của bạn..." required></textarea>
+                                            
+                        <!-- Trường tải ảnh -->
+                        <div class="mb-2">
+                            <label class="form-label" style="font-size:.87rem;color:#334155;">Ảnh đính kèm (tùy chọn):</label>
+                            <input type="file" name="image" class="form-control" 
+                                   accept="image/*" 
+                                   style="font-size:.85rem;">
+                            <div class="form-text" style="font-size:.75rem;color:#64748b;">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Định dạng: JPG, PNG, GIF, WEBP. Tối đa 3MB.
+                            </div>
+                        </div>
+                                            
                         <button class="btn btn-warning">Gửi đánh giá</button>
                     </form>
 
