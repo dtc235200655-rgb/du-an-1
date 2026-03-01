@@ -1,0 +1,287 @@
+{% extends "base.html" %}
+
+{% block title %}{{ course.title }} - Online Courses{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Fix ảnh chi tiết khóa học */
+    .course-detail-image {
+        width: 100%;
+        height: auto;
+        max-height: 450px;
+        object-fit: cover;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    
+    .price-tag {
+        font-size: 2.5rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .course-info-card {
+        background: #ffffff;
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        border: 1px solid #e9ecef;
+    }
+    
+    .enroll-btn {
+        font-size: 1.1rem;
+        padding: 14px 40px;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+    
+    .enroll-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    
+    .info-item {
+        display: flex;
+        align-items: center;
+        padding: 12px 0;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .info-item:last-child {
+        border-bottom: none;
+    }
+    
+    .info-item i {
+        font-size: 1.5rem;
+        margin-right: 12px;
+        color: #667eea;
+    }
+    
+    .category-badge {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 8px 20px;
+        border-radius: 25px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        display: inline-block;
+    }
+    
+    .description-section {
+        background: #f8f9fa;
+        padding: 2rem;
+        border-radius: 15px;
+        line-height: 1.8;
+        margin-top: 2rem;
+    }
+    
+    .status-alert {
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="/" class="text-decoration-none">
+                    <i class="bi bi-house-door me-1"></i>Home
+                </a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="/courses/" class="text-decoration-none">
+                    <i class="bi bi-book me-1"></i>Courses
+                </a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">{{ course.title|truncatewords:5 }}</li>
+        </ol>
+    </nav>
+
+    <div class="row g-4">
+        <!-- Cột trái: Ảnh và mô tả khóa học -->
+        <div class="col-lg-7">
+            <!-- Ảnh khóa học -->
+            {% if course.image %}
+                <img src="{{ course.image.url }}" class="course-detail-image mb-4" alt="{{ course.title }}">
+            {% else %}
+                <img src="https://via.placeholder.com/800x450/667eea/ffffff?text=Online+Course" 
+                     class="course-detail-image mb-4" alt="Default course image">
+            {% endif %}
+            
+            <!-- Tiêu đề (mobile) -->
+            <div class="d-lg-none mb-4">
+                <h1 class="fw-bold mb-3">{{ course.title }}</h1>
+                {% if course.category %}
+                <span class="category-badge">
+                    <i class="bi bi-tag-fill me-2"></i>{{ course.category.name }}
+                </span>
+                {% endif %}
+            </div>
+            
+            <!-- Mô tả chi tiết -->
+            <div class="description-section">
+                <h3 class="fw-bold mb-4">
+                    <i class="bi bi-file-text me-2"></i>Mô tả khóa học
+                </h3>
+                <div style="white-space: pre-line; line-height: 2;">
+                    {{ course.description }}
+                </div>
+            </div>
+            
+            <!-- Thông tin giảng viên -->
+            <div class="card mt-4 border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="fw-bold mb-3">
+                        <i class="bi bi-person-circle me-2"></i>Giảng viên
+                    </h5>
+                    <div class="d-flex align-items-center">
+                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3"
+                             style="width: 50px; height: 50px; font-size: 1.5rem;">
+                            <i class="bi bi-person"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-1 fw-bold">{{ course.created_by.get_full_name|default:course.created_by.username }}</h6>
+                            <small class="text-muted">
+                                <i class="bi bi-calendar-event me-1"></i>
+                                Tạo ngày: {{ course.created_at|date:"d/m/Y" }}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cột phải: Thông tin và nút đăng ký -->
+        <div class="col-lg-5">
+            <div class="course-info-card sticky-top" style="top: 20px;">
+                <!-- Tiêu đề (desktop) -->
+                <div class="d-none d-lg-block">
+                    <h1 class="fw-bold mb-3">{{ course.title }}</h1>
+                    {% if course.category %}
+                    <span class="category-badge mb-3">
+                        <i class="bi bi-tag-fill me-2"></i>{{ course.category.name }}
+                    </span>
+                    {% endif %}
+                </div>
+
+                <hr class="my-4">
+
+                <!-- Giá khóa học -->
+                <div class="text-center mb-4">
+                    <span class="text-muted d-block mb-2">Giá khóa học</span>
+                    <span class="price-tag">
+                        {{ course.price|floatformat:0 }} đ
+                    </span>
+                </div>
+
+                <hr class="my-4">
+
+                <!-- Thông tin khóa học -->
+                <div class="mb-4">
+                    <div class="info-item">
+                        <i class="bi bi-clock"></i>
+                        <div>
+                            <strong>Thời lượng</strong>
+                            <p class="mb-0 text-muted">Linh hoạt</p>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <i class="bi bi-people"></i>
+                        <div>
+                            <strong>Học viên</strong>
+                            <p class="mb-0 text-muted">Không giới hạn</p>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <i class="bi bi-calendar-check"></i>
+                        <div>
+                            <strong>Ngày tạo</strong>
+                            <p class="mb-0 text-muted">{{ course.created_at|date:"d/m/Y" }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="my-4">
+
+                <!-- Form đăng ký học -->
+                {% if user.is_authenticated %}
+                    {% if is_enrolled %}
+                        {% if enrollment_status == 'pending' %}
+                        <div class="status-alert alert alert-warning">
+                            <i class="bi bi-clock-history me-2"></i>
+                            <strong>Chờ duyệt</strong>
+                            <p class="mb-0 mt-2">Bạn đã đăng ký khóa học này. Đang chờ admin duyệt.</p>
+                        </div>
+                        {% elif enrollment_status == 'approved' %}
+                        <div class="status-alert alert alert-success">
+                            <i class="bi bi-check-circle me-2"></i>
+                            <strong>Đã duyệt</strong>
+                            <p class="mb-0 mt-2">Bạn đã được duyệt cho khóa học này!</p>
+                        </div>
+                        <a href="/dashboard/" class="btn btn-primary enroll-btn w-100 mb-3">
+                            <i class="bi bi-play-circle me-2"></i>Vào học ngay
+                        </a>
+                        {% elif enrollment_status == 'rejected' %}
+                        <div class="status-alert alert alert-danger">
+                            <i class="bi bi-x-circle me-2"></i>
+                            <strong>Đã từ chối</strong>
+                            <p class="mb-0 mt-2">Đăng ký của bạn đã bị từ chối. Bạn có thể đăng ký lại.</p>
+                        </div>
+                        <form method="post" action="{% url 'courses:enroll_course' course.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-success enroll-btn w-100 mb-3">
+                                <i class="bi bi-arrow-repeat me-2"></i>Đăng ký lại
+                            </button>
+                        </form>
+                        {% endif %}
+                    {% else %}
+                        <form method="post" action="{% url 'courses:enroll_course' course.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-success enroll-btn w-100 mb-3">
+                                <i class="bi bi-check-circle me-2"></i>Đăng ký học ngay
+                            </button>
+                        </form>
+                    {% endif %}
+                {% else %}
+                    <!-- Chưa đăng nhập -->
+                    <div class="status-alert alert alert-info">
+                        <i class="bi bi-info-circle me-2"></i>
+                        <strong>Vui lòng đăng nhập</strong>
+                        <p class="mb-0 mt-2">Bạn cần đăng nhập để đăng ký khóa học này.</p>
+                    </div>
+                    <a href="/login/?next={{ request.path }}" class="btn btn-primary enroll-btn w-100 mb-3">
+                        <i class="bi bi-box-arrow-in-right me-2"></i>Đăng nhập ngay
+                    </a>
+                {% endif %}
+
+                <a href="/courses/" class="btn btn-outline-secondary w-100">
+                    <i class="bi bi-arrow-left me-2"></i>Quay lại danh sách
+                </a>
+
+                <!-- Thông tin thêm -->
+                <div class="mt-4 pt-4 border-top">
+                    <h6 class="fw-bold mb-3">
+                        <i class="bi bi-info-circle me-2"></i>Lưu ý
+                    </h6>
+                    <ul class="small text-muted mb-0 ps-3">
+                        <li class="mb-2">Sau khi đăng ký, bạn cần chờ admin duyệt để bắt đầu học</li>
+                        <li class="mb-2">Bạn sẽ nhận được thông báo qua email khi được duyệt</li>
+                        <li>Có thể truy cập khóa học bất kỳ lúc nào sau khi được duyệt</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

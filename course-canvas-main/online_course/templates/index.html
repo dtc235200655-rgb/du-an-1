@@ -1,0 +1,507 @@
+{% extends "base.html" %}
+
+{% block title %}Trang chủ - Online Courses{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Hero Section */
+    .hero-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 100px 0;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%23ffffff" fill-opacity="0.1" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,122.7C672,117,768,139,864,154.7C960,171,1056,181,1152,165.3C1248,149,1344,107,1392,85.3L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') no-repeat bottom;
+        background-size: cover;
+        opacity: 0.3;
+    }
+    
+    .hero-title {
+        font-size: 3.5rem;
+        font-weight: 800;
+        line-height: 1.2;
+        margin-bottom: 1.5rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.3rem;
+        opacity: 0.95;
+        margin-bottom: 2rem;
+    }
+    
+    .hero-btn {
+        padding: 15px 40px;
+        font-size: 1.1rem;
+        border-radius: 50px;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+    
+    .hero-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    }
+    
+    .hero-image {
+        animation: float 3s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-20px); }
+    }
+    
+    /* Stats Section */
+    .stats-section {
+        background: #f8f9fa;
+        padding: 60px 0;
+    }
+    
+    .stat-card {
+        text-align: center;
+        padding: 2rem;
+    }
+    
+    .stat-number {
+        font-size: 3rem;
+        font-weight: 700;
+        color: #667eea;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-label {
+        font-size: 1.1rem;
+        color: #6c757d;
+    }
+    
+    /* Features Section */
+    .feature-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        color: white;
+        margin: 0 auto 1.5rem;
+        transition: all 0.3s;
+    }
+    
+    .feature-card:hover .feature-icon {
+        transform: scale(1.1) rotate(5deg);
+    }
+    
+    .feature-card {
+        text-align: center;
+        padding: 2rem;
+        border-radius: 15px;
+        transition: all 0.3s;
+    }
+    
+    .feature-card:hover {
+        background: white;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        transform: translateY(-5px);
+    }
+    
+    /* Course Card */
+    .course-card-home {
+        border: none;
+        border-radius: 15px;
+        overflow: hidden;
+        transition: all 0.3s;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    }
+    
+    .course-card-home:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+    }
+    
+    .course-image-home {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+    }
+    
+    .course-category {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        display: inline-block;
+    }
+    
+    /* CTA Section */
+    .cta-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 80px 0;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .cta-section::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 500px;
+        height: 500px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 50%;
+    }
+    
+    .cta-section::after {
+        content: '';
+        position: absolute;
+        bottom: -30%;
+        left: -5%;
+        width: 400px;
+        height: 400px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 50%;
+    }
+    
+    /* Section Title */
+    .section-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+    
+    .section-subtitle {
+        font-size: 1.2rem;
+        color: #6c757d;
+        margin-bottom: 3rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- ========== HERO SECTION ========== -->
+<section class="hero-section">
+    <div class="container position-relative">
+        <div class="row align-items-center">
+            <div class="col-lg-6 mb-5 mb-lg-0">
+                <h1 class="hero-title">
+                    Học tập không giới hạn
+                    <span style="color: #ffd700;">cùng Online Courses</span>
+                </h1>
+                <p class="hero-subtitle">
+                    Khám phá hàng ngàn khóa học chất lượng cao từ các chuyên gia hàng đầu.
+                    Bắt đầu hành trình phát triển kỹ năng của bạn ngay hôm nay!
+                </p>
+                <div class="d-flex gap-3 flex-wrap">
+                    <a href="/courses/" class="btn btn-light btn-lg hero-btn">
+                        <i class="bi bi-rocket-takeoff me-2"></i>Khám phá khóa học
+                    </a>
+                    {% if not user.is_authenticated %}
+                    <a href="/register/" class="btn btn-outline-light btn-lg hero-btn">
+                        <i class="bi bi-person-plus me-2"></i>Đăng ký miễn phí
+                    </a>
+                    {% endif %}
+                </div>
+                
+                <!-- Trust Badges -->
+                <div class="mt-4 d-flex gap-4 flex-wrap">
+                    <div>
+                        <i class="bi bi-shield-check me-2"></i>
+                        <small>Chứng chỉ uy tín</small>
+                    </div>
+                    <div>
+                        <i class="bi bi-people me-2"></i>
+                        <small>10,000+ học viên</small>
+                    </div>
+                    <div>
+                        <i class="bi bi-star-fill me-2"></i>
+                        <small>Đánh giá 4.9/5</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 text-center">
+                <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=600&h=400&fit=crop" 
+                     alt="Online Learning" 
+                     class="img-fluid rounded-4 shadow-lg hero-image"
+                     style="max-width: 90%;">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========== STATS SECTION ========== -->
+<section class="stats-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-6 col-md-3">
+                <div class="stat-card">
+                    <div class="stat-number">{{ total_courses }}</div>
+                    <div class="stat-label"></div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-card">
+                    <div class="stat-number">10K+</div>
+                    <div class="stat-label">Học viên</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-card">
+                    <div class="stat-number">50+</div>
+                    <div class="stat-label">Giảng viên</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-card">
+                    <div class="stat-number">4.9</div>
+                    <div class="stat-label">Đánh giá</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========== FEATURES SECTION ========== -->
+<section class="py-5 my-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="section-title">Tại sao chọn chúng tôi?</h2>
+            <p class="section-subtitle">Những ưu điểm vượt trội của nền tảng học trực tuyến</p>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-laptop"></i>
+                    </div>
+                    <h5 class="fw-bold mb-3">Học mọi lúc mọi nơi</h5>
+                    <p class="text-muted">Truy cập khóa học bất kỳ lúc nào, trên mọi thiết bị</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-award"></i>
+                    </div>
+                    <h5 class="fw-bold mb-3">Chứng chỉ uy tín</h5>
+                    <p class="text-muted">Nhận chứng chỉ được công nhận sau khi hoàn thành</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-people"></i>
+                    </div>
+                    <h5 class="fw-bold mb-3">Cộng đồng hỗ trợ</h5>
+                    <p class="text-muted">Kết nối với hàng ngàn học viên khác</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-infinity"></i>
+                    </div>
+                    <h5 class="fw-bold mb-3">Truy cập vĩnh viễn</h5>
+                    <p class="text-muted">Học lại bất kỳ lúc nào bạn muốn</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========== FEATURED COURSES SECTION ========== -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="section-title">Khóa học nổi bật</h2>
+            <p class="section-subtitle">Những khóa học được yêu thích nhất</p>
+        </div>
+        
+        <div class="row g-4">
+            {% for course in featured_courses %}
+            <div class="col-md-6 col-lg-4">
+                <article class="card course-card-home h-100">
+                    {% if course.image %}
+                    <img src="{{ course.image.url }}" class="course-image-home" alt="{{ course.title }}">
+                    {% else %}
+                    <img src="https://via.placeholder.com/400x200/667eea/ffffff?text=Course" 
+                         class="course-image-home" alt="Course">
+                    {% endif %}
+                    
+                    <div class="card-body">
+                        {% if course.category %}
+                        <span class="course-category mb-2">
+                            {{ course.category.name }}
+                        </span>
+                        {% endif %}
+                        
+                        <h5 class="card-title fw-bold mt-3 mb-2">{{ course.title }}</h5>
+                        <p class="card-text text-muted small">
+                            {{ course.description|truncatewords:15 }}
+                        </p>
+                        
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <div>
+                                <i class="bi bi-person-circle text-muted me-1"></i>
+                                <small class="text-muted">{{ course.created_by.username }}</small>
+                            </div>
+                        </div>
+                        
+                        <hr class="my-3">
+                        
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="fw-bold text-primary fs-5">
+                                {{ course.price|floatformat:0 }} đ
+                            </span>
+                            <a href="{% url 'courses:course_detail' course.id %}" 
+                               class="btn btn-outline-primary">
+                                Xem chi tiết
+                            </a>
+                        </div>
+                    </div>
+                </article>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <p class="text-center text-muted">Chưa có khóa học nào</p>
+            </div>
+            {% endfor %}
+        </div>
+        
+        {% if featured_courses %}
+        <div class="text-center mt-5">
+            <a href="/courses/" class="btn btn-primary btn-lg">
+                Xem tất cả khóa học <i class="bi bi-arrow-right ms-2"></i>
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- ========== CTA SECTION ========== -->
+<section class="cta-section">
+    <div class="container position-relative">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <h2 class="display-4 fw-bold mb-4">
+                    Sẵn sàng bắt đầu học?
+                </h2>
+                <p class="lead mb-4 opacity-90">
+                    Tham gia cùng hàng ngàn học viên đã tin tưởng chúng tôi.
+                    Đăng ký ngay để nhận ưu đãi đặc biệt!
+                </p>
+                {% if user.is_authenticated %}
+                <a href="/courses/" class="btn btn-light btn-lg hero-btn">
+                    <i class="bi bi-search me-2"></i>Khám phá khóa học
+                </a>
+                {% else %}
+                <a href="/register/" class="btn btn-light btn-lg hero-btn">
+                    <i class="bi bi-person-plus me-2"></i>Đăng ký miễn phí ngay
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========== TESTIMONIALS (Optional) ========== -->
+<section class="py-5 my-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="section-title">Học viên nói gì về chúng tôi</h2>
+            <p class="section-subtitle">Phản hồi từ những người đã học</p>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body p-4">
+                        <div class="mb-3">
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                        </div>
+                        <p class="mb-4">"Khóa học rất chất lượng và dễ hiểu. Tôi đã học được rất nhiều kiến thức bổ ích!"</p>
+                        <div class="d-flex align-items-center">
+                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3"
+                                 style="width: 50px; height: 50px;">
+                                <i class="bi bi-person fs-4"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-0 fw-bold">Nguyễn Văn An</h6>
+                                <small class="text-muted">Web Developer</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body p-4">
+                        <div class="mb-3">
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                        </div>
+                        <p class="mb-4">"Giảng viên nhiệt tình, nội dung cập nhật. Tôi rất hài lòng với chất lượng khóa học."</p>
+                        <div class="d-flex align-items-center">
+                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3"
+                                 style="width: 50px; height: 50px;">
+                                <i class="bi bi-person fs-4"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-0 fw-bold">Trần Thị Bích</h6>
+                                <small class="text-muted">Data Analyst</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body p-4">
+                        <div class="mb-3">
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                        </div>
+                        <p class="mb-4">"Nền tảng học tuyệt vời! Tôi đã nâng cao được kỹ năng và tự tin hơn trong công việc."</p>
+                        <div class="d-flex align-items-center">
+                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3"
+                                 style="width: 50px; height: 50px;">
+                                <i class="bi bi-person fs-4"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-0 fw-bold">Lê Văn Chính</h6>
+                                <small class="text-muted">Designer</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

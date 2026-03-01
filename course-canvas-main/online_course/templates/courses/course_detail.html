@@ -1,0 +1,591 @@
+{% extends "base.html" %}
+
+{% block title %}{{ course.title }} - Online Courses{% endblock %}
+
+{% block extra_css %}
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap');
+
+    :root {
+        --primary:       #5624d0;
+        --primary-dark:  #3d1a9e;
+        --primary-light: #f0ecff;
+        --accent:        #f59e0b;
+        --success:       #1a7a42;
+        --border:        #e2e8f0;
+        --bg:            #f8fafc;
+        --text:          #1e293b;
+        --text-mid:      #334155;
+        --muted:         #64748b;
+        --white:         #ffffff;
+        --radius:        12px;
+    }
+
+    body {
+        font-family: 'Inter', sans-serif;
+        color: var(--text);
+        background: #f1f5f9;
+    }
+
+    /* ────────────────────────────
+       HERO
+    ──────────────────────────── */
+    .hero {
+        background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 60%, #2d1b6b 100%);
+        padding: 2.5rem 0 3rem;
+        color: #fff;
+    }
+
+    .hero-crumb {
+        font-size: .81rem;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+    .hero-crumb a { color: #a5b4fc; text-decoration: none; }
+    .hero-crumb a:hover { text-decoration: underline; }
+    .hero-crumb .sep { color: rgba(255,255,255,.3); margin: 0 2px; }
+    .hero-crumb .cur { color: rgba(255,255,255,.55); }
+
+    .hero-badge {
+        display: inline-flex; align-items: center; gap: 6px;
+        background: rgba(255,255,255,.1);
+        border: 1px solid rgba(255,255,255,.18);
+        border-radius: 20px;
+        padding: 4px 14px;
+        font-size: .75rem; font-weight: 600;
+        letter-spacing: .5px; text-transform: uppercase;
+        color: #c4b5fd; margin-bottom: .9rem;
+    }
+
+    .hero h1 {
+        font-family: 'Sora', sans-serif;
+        font-size: clamp(1.35rem, 2.5vw, 2rem);
+        font-weight: 800; line-height: 1.3;
+        margin-bottom: .7rem;
+    }
+
+    .hero-desc {
+        color: #cbd5e1; font-size: .92rem;
+        line-height: 1.7; margin-bottom: 1.2rem;
+    }
+
+    .hero-meta {
+        display: flex; flex-wrap: wrap;
+        gap: .55rem 1.3rem;
+        font-size: .81rem; color: #a5b4fc;
+    }
+    .hero-meta span { display: flex; align-items: center; gap: 5px; }
+
+    /* ────────────────────────────
+       PAGE BODY
+    ──────────────────────────── */
+    .page-body {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1rem 4rem;
+    }
+
+    /* ────────────────────────────
+       SECTION CARD  (cột trái)
+    ──────────────────────────── */
+    .section-card {
+        background: var(--white);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 1.6rem;
+        margin-bottom: 1.4rem;
+    }
+    .section-card:last-child { margin-bottom: 0; }
+
+    .section-card h4 {
+        font-family: 'Sora', sans-serif;
+        font-size: 1.05rem; font-weight: 700;
+        display: flex; align-items: center; gap: 8px;
+        padding-bottom: .8rem; margin-bottom: 1.1rem;
+        border-bottom: 2px solid var(--border);
+        color: var(--text);
+    }
+
+    .section-card h4 i { color: var(--primary); }
+
+    /* Learn grid */
+    .learn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 16px; }
+    @media (max-width: 576px) { .learn-grid { grid-template-columns: 1fr; } }
+
+    .learn-item {
+        display: flex; gap: 8px;
+        font-size: .87rem; color: var(--text-mid); line-height: 1.5;
+    }
+    .learn-item i { color: var(--primary); flex-shrink: 0; margin-top: 2px; }
+
+    /* Description */
+    .desc-body {
+        font-size: .92rem; line-height: 1.9;
+        color: var(--text-mid); white-space: pre-line;
+    }
+
+    /* Instructor */
+    .instructor-row { display: flex; align-items: center; gap: 1rem; }
+    .i-avatar {
+        width: 50px; height: 50px; border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary), #7c3aed);
+        color: #fff; display: flex; align-items: center;
+        justify-content: center; font-size: 1.3rem; flex-shrink: 0;
+    }
+    .i-name {
+        font-family: 'Sora', sans-serif; font-weight: 700;
+        font-size: .93rem; color: var(--primary);
+    }
+    .i-sub { font-size: .79rem; color: var(--muted); margin-top: 2px; }
+
+    /* ────────────────────────────
+       REVIEW BLOCK  (giữ nguyên
+       cấu trúc user cung cấp,
+       chỉ thêm style)
+    ──────────────────────────── */
+    .review-card {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 1rem 1.1rem;
+        margin-bottom: .9rem;
+    }
+
+    .review-card strong {
+        font-family: 'Sora', sans-serif;
+        font-size: .9rem; color: var(--text);
+    }
+
+    .review-card p { margin-bottom: 0; font-size: .88rem; color: var(--text-mid); line-height: 1.6; }
+
+    /* Rating summary */
+    .rating-summary {
+        background: linear-gradient(135deg, #fef9ec, #fffbf0);
+        border: 1px solid #fde68a;
+        border-radius: 8px;
+        padding: .9rem 1.1rem;
+        margin-bottom: 1.1rem;
+        display: flex; align-items: center; gap: 10px;
+    }
+
+    /* Form elements trong review */
+    .section-card .form-control {
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        font-size: .88rem; font-family: 'Inter', sans-serif;
+        transition: border-color .2s, box-shadow .2s;
+        background: var(--bg);
+    }
+    .section-card .form-control:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(86,36,208,.1);
+        outline: none; background: #fff;
+    }
+
+    .section-card textarea.form-control { min-height: 95px; resize: vertical; }
+
+    .section-card .btn-warning {
+        background: var(--accent); color: #1c1d1f;
+        border: none; border-radius: 6px;
+        padding: 9px 22px; font-size: .87rem; font-weight: 700;
+        cursor: pointer; transition: background .15s, transform .1s;
+        font-family: 'Sora', sans-serif;
+    }
+    .section-card .btn-warning:hover { background: #d97706; transform: translateY(-1px); }
+
+    .section-card .btn-dark {
+        background: var(--text); color: #fff;
+        border: none; border-radius: 6px;
+        padding: 9px 20px; font-size: .87rem; font-weight: 700;
+        cursor: pointer; text-decoration: none; display: inline-block;
+        font-family: 'Sora', sans-serif; transition: background .15s;
+    }
+    .section-card .btn-dark:hover { background: #334155; color: #fff; }
+
+    /* ────────────────────────────
+       ENROLL CARD  (cột phải)
+    ──────────────────────────── */
+    .enroll-wrap { position: sticky; top: 16px; }
+
+    .enroll-card {
+        background: var(--white);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        box-shadow: 0 8px 32px rgba(0,0,0,.1);
+        overflow: hidden;
+    }
+
+    .enroll-thumb {
+        width: 100%; aspect-ratio: 16/9;
+        object-fit: cover; display: block;
+    }
+
+    .enroll-body { padding: 1.4rem; }
+
+    .price-lbl { font-size: .73rem; color: var(--muted); margin-bottom: 3px; }
+    .price-val {
+        font-family: 'Sora', sans-serif;
+        font-size: 1.9rem; font-weight: 800;
+        color: var(--text); line-height: 1;
+        margin-bottom: 1.2rem;
+    }
+
+    /* Meta rows */
+    .cmeta-item {
+        display: flex; align-items: center; gap: 10px;
+        padding: 9px 0; border-bottom: 1px solid var(--border);
+        font-size: .84rem;
+    }
+    .cmeta-item:last-child { border-bottom: none; }
+    .cmeta-item i { color: var(--primary); font-size: .95rem; width: 18px; text-align: center; }
+    .cmeta-lbl { font-size: .74rem; color: var(--muted); }
+    .cmeta-val { font-weight: 600; font-size: .86rem; }
+
+    /* Enroll buttons */
+    .btn-enroll {
+        display: block; width: 100%;
+        padding: 13px 16px; border: none; border-radius: 7px;
+        font-family: 'Sora', sans-serif; font-size: .93rem; font-weight: 700;
+        cursor: pointer; text-align: center; text-decoration: none;
+        transition: filter .15s, transform .1s;
+        line-height: 1.4; color: #fff;
+    }
+    .btn-enroll:hover { filter: brightness(88%); transform: translateY(-1px); color: #fff; text-decoration: none; }
+    .btn-purple { background: var(--primary); }
+    .btn-green  { background: var(--success); }
+
+    /* Includes */
+    .inc-list { list-style: none; padding: 0; margin: 0; }
+    .inc-list li {
+        display: flex; align-items: center; gap: 8px;
+        font-size: .83rem; color: var(--text-mid); padding: 5px 0;
+    }
+    .inc-list li i { color: var(--muted); font-size: .9rem; }
+
+    /* Notes */
+    .note-list { list-style: none; padding: 0; margin: 0; }
+    .note-list li {
+        display: flex; gap: 6px;
+        font-size: .77rem; color: var(--muted); padding: 3px 0; line-height: 1.4;
+    }
+    .note-list li i { color: var(--primary); flex-shrink: 0; margin-top: 2px; font-size: .8rem; }
+
+    /* Status pills */
+    .ipill {
+        border-radius: 8px; padding: .85rem 1rem;
+        display: flex; gap: 10px; font-size: .86rem;
+        margin-bottom: .75rem;
+    }
+    .ipill i { font-size: 1.05rem; flex-shrink: 0; margin-top: 1px; }
+    .ipill b { display: block; margin-bottom: 2px; }
+    .ipill.green  { background: #ecfdf5; border: 1px solid #6ee7b7; color: #065f46; }
+    .ipill.yellow { background: #fffbeb; border: 1px solid #fde68a; color: #92400e; }
+    .ipill.red    { background: #fef2f2; border: 1px solid #fca5a5; color: #991b1b; }
+
+    .divider { border: none; border-top: 1px solid var(--border); margin: 1.1rem 0; }
+
+    .back-link {
+        display: block; text-align: center; margin-top: .9rem;
+        font-size: .8rem; color: var(--muted); text-decoration: none;
+    }
+    .back-link:hover { color: var(--primary); }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- ════ HERO ════════════════════════════════════════ -->
+<div class="hero">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 col-lg-7">
+
+                <div class="hero-crumb">
+                    <a href="/"><i class="bi bi-house-door me-1"></i>Home</a>
+                    <span class="sep">/</span>
+                    <a href="/courses/"><i class="bi bi-grid me-1"></i>Khóa học</a>
+                    <span class="sep">/</span>
+                    <span class="cur">{{ course.title|truncatewords:5 }}</span>
+                </div>
+
+                {% if course.category %}
+                <div class="hero-badge">
+                    <i class="bi bi-tag-fill"></i>{{ course.category.name }}
+                </div>
+                {% endif %}
+
+                <h1>{{ course.title }}</h1>
+                <p class="hero-desc">{{ course.description|truncatewords:28 }}</p>
+
+                <div class="hero-meta">
+                    <span><i class="bi bi-person-circle"></i>{{ course.created_by.get_full_name|default:course.created_by.username }}</span>
+                    <span><i class="bi bi-calendar3"></i>{{ course.created_at|date:"d/m/Y" }}</span>
+                    <span><i class="bi bi-clock"></i>Học linh hoạt</span>
+                    <span><i class="bi bi-people"></i>Không giới hạn</span>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ════ BODY ═════════════════════════════════════════ -->
+<div class="page-body">
+    <div class="row g-4 align-items-start">
+
+        <!-- ═══ CỘT TRÁI ═══════════════════════════════ -->
+        <div class="col-12 col-lg-7">
+
+            <!-- 1. BẠN SẼ HỌC ĐƯỢC GÌ -->
+            <div class="section-card">
+                <h4><i class="bi bi-patch-check-fill"></i>Bạn sẽ học được gì?</h4>
+                <div class="learn-grid">
+                    <div class="learn-item"><i class="bi bi-check2-circle"></i>Nắm vững kiến thức cốt lõi</div>
+                    <div class="learn-item"><i class="bi bi-check2-circle"></i>Áp dụng thực tế ngay sau khóa học</div>
+                    <div class="learn-item"><i class="bi bi-check2-circle"></i>Lộ trình học có hệ thống, rõ ràng</div>
+                    <div class="learn-item"><i class="bi bi-check2-circle"></i>Truy cập bài học bất kỳ lúc nào</div>
+                </div>
+            </div>
+
+            <!-- 2. MÔ TẢ KHÓA HỌC -->
+            <div class="section-card">
+                <h4><i class="bi bi-file-text-fill"></i>Mô tả khóa học</h4>
+                <div class="desc-body">{{ course.description }}</div>
+            </div>
+
+            <!-- 3. GIẢNG VIÊN -->
+            <div class="section-card">
+                <h4><i class="bi bi-person-workspace"></i>Giảng viên</h4>
+                <div class="instructor-row">
+                    <div class="i-avatar"><i class="bi bi-person"></i></div>
+                    <div>
+                        <div class="i-name">{{ course.created_by.get_full_name|default:course.created_by.username }}</div>
+                        <div class="i-sub"><i class="bi bi-calendar-event me-1"></i>Tạo khóa học: {{ course.created_at|date:"d/m/Y" }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. ĐÁNH GIÁ KHÓA HỌC ─── NGUYÊN BẢN USER ─── -->
+            <div class="section-card">
+                <h4><i class="bi bi-star-fill" style="color:var(--accent)"></i>Đánh giá khóa học</h4>
+
+                {% if user.is_authenticated %}
+
+                    {% if average_rating %}
+                    <div style="font-size:22px;font-weight:600;margin-bottom:10px;">
+                        {{ average_rating }} ⭐
+                        <span style="font-size:14px;color:#64748b">
+                            ({{ reviews.count }} đánh giá)
+                        </span>
+                    </div>
+                    {% endif %}
+
+                    <!-- Danh sách review -->
+                    {% for review in reviews %}
+    <div class="review-card">
+        <strong>{{ review.user.username }}</strong>
+
+        <div>
+            {% for i in "12345" %}
+                {% if forloop.counter <= review.rating %}
+                    <span style="color:#f59e0b">★</span>
+                {% else %}
+                    <span style="color:#ccc">★</span>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        <small style="color:#64748b">
+            {{ review.created_at|date:"d/m/Y" }}
+        </small>
+
+        <p style="margin-top:8px;">{{ review.comment }}</p>
+
+        <!-- 🔥 PHẦN ADMIN REPLY -->
+        {% if review.admin_reply %}
+        <div style="
+            background:#f1f5ff;
+            border-left:4px solid #5624d0;
+            padding:10px 14px;
+            margin-top:10px;
+            border-radius:6px;
+        ">
+            <strong style="color:#5624d0;">Phản hồi từ Admin:</strong>
+            <p style="margin:5px 0 0 0;">{{ review.admin_reply }}</p>
+        </div>
+        {% endif %}
+
+    </div>
+{% endfor %}
+
+                    <hr>
+
+                    <!-- FORM REVIEW -->
+                    <form method="POST" action="{% url 'courses:add_review' course.pk %}">
+                        {% csrf_token %}
+                        <label>Đánh giá sao:</label>
+                        <select name="rating" required class="form-control mb-2">
+                            <option value="">Chọn sao</option>
+                            <option value="5">5 ⭐</option>
+                            <option value="4">4 ⭐</option>
+                            <option value="3">3 ⭐</option>
+                            <option value="2">2 ⭐</option>
+                            <option value="1">1 ⭐</option>
+                        </select>
+                        <textarea name="comment" class="form-control mb-2"
+                                  placeholder="Viết nhận xét của bạn..." required></textarea>
+                        <button class="btn btn-warning">Gửi đánh giá</button>
+                    </form>
+
+                {% else %}
+                    <div style="padding:20px;background:#f8fafc;border-radius:10px;">
+                        <p>Bạn cần đăng nhập để xem và gửi đánh giá.</p>
+                        <a href="{% url 'login' %}" class="btn btn-dark">
+                            Đăng nhập ngay
+                        </a>
+                    </div>
+                {% endif %}
+
+            </div>
+            <!-- /ĐÁNH GIÁ -->
+
+        </div>
+        <!-- /CỘT TRÁI -->
+
+        <!-- ═══ CỘT PHẢI: ENROLL CARD ══════════════════ -->
+        <div class="col-12 col-lg-5">
+            <div class="enroll-wrap">
+                <div class="enroll-card">
+
+                    <!-- Thumbnail -->
+                    {% if course.image %}
+                        <img src="{{ course.image.url }}" class="enroll-thumb" alt="{{ course.title }}">
+                    {% else %}
+                        <img src="https://via.placeholder.com/760x428/0f172a/7c3aed?text=Online+Course"
+                             class="enroll-thumb" alt="{{ course.title }}">
+                    {% endif %}
+
+                    <div class="enroll-body">
+
+                        <!-- Tiêu đề -->
+                        <h5 style="font-family:'Sora',sans-serif;font-weight:700;font-size:1rem;margin-bottom:.3rem;line-height:1.4;">
+                            {{ course.title }}
+                        </h5>
+
+                        {% if course.category %}
+                        <span style="display:inline-block;background:var(--primary-light);color:var(--primary);
+                                     font-size:.73rem;font-weight:600;padding:3px 10px;border-radius:20px;margin-bottom:1rem;">
+                            {{ course.category.name }}
+                        </span>
+                        {% endif %}
+
+                        <!-- Giá -->
+                        <div class="price-lbl">Giá khóa học</div>
+                        <div class="price-val">{{ course.price|floatformat:0 }} đ</div>
+
+                        <!-- Thông tin meta -->
+                        <div style="margin-bottom:1.2rem;">
+                            <div class="cmeta-item">
+                                <i class="bi bi-clock"></i>
+                                <div>
+                                    <div class="cmeta-lbl">Thời lượng</div>
+                                    <div class="cmeta-val">Linh hoạt</div>
+                                </div>
+                            </div>
+                            <div class="cmeta-item">
+                                <i class="bi bi-people"></i>
+                                <div>
+                                    <div class="cmeta-lbl">Học viên</div>
+                                    <div class="cmeta-val">Không giới hạn</div>
+                                </div>
+                            </div>
+                            <div class="cmeta-item">
+                                <i class="bi bi-calendar-check"></i>
+                                <div>
+                                    <div class="cmeta-lbl">Ngày tạo</div>
+                                    <div class="cmeta-val">{{ course.created_at|date:"d/m/Y" }}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Nút đăng ký / trạng thái -->
+                        {% if user.is_authenticated %}
+                            {% if is_enrolled %}
+                                {% if enrollment_status == 'pending' %}
+                                <div class="ipill yellow">
+                                    <i class="bi bi-hourglass-split"></i>
+                                    <div><b>Đang chờ duyệt</b>Admin sẽ xét duyệt đăng ký của bạn sớm nhất.</div>
+                                </div>
+                                {% elif enrollment_status == 'approved' %}
+                                <div class="ipill green">
+                                    <i class="bi bi-check-circle-fill"></i>
+                                    <div><b>Đã được duyệt!</b>Bạn có thể bắt đầu học ngay.</div>
+                                </div>
+                                <a href="/dashboard/" class="btn-enroll btn-green">
+                                    <i class="bi bi-play-circle me-2"></i>Vào học ngay
+                                </a>
+                                {% elif enrollment_status == 'rejected' %}
+                                <div class="ipill red">
+                                    <i class="bi bi-x-circle-fill"></i>
+                                    <div><b>Đăng ký bị từ chối</b>Bạn có thể gửi lại đơn đăng ký.</div>
+                                </div>
+                                <form method="post" action="{% url 'courses:enroll_course' course.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn-enroll btn-purple">
+                                        <i class="bi bi-arrow-repeat me-2"></i>Đăng ký lại
+                                    </button>
+                                </form>
+                                {% endif %}
+                            {% else %}
+                            <form method="post" action="{% url 'courses:enroll_course' course.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn-enroll btn-purple">
+                                    <i class="bi bi-lightning-charge-fill me-2"></i>Đăng ký học ngay
+                                </button>
+                            </form>
+                            {% endif %}
+                        {% else %}
+                        <a href="/login/?next={{ request.path }}" class="btn-enroll btn-purple">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>Đăng nhập để đăng ký
+                        </a>
+                        {% endif %}
+
+                        <div class="divider"></div>
+
+                        <!-- Khóa học bao gồm -->
+                        <p style="font-size:.79rem;font-weight:700;color:var(--text);margin:0 0 .5rem;">
+                            Khóa học bao gồm:
+                        </p>
+                        <ul class="inc-list mb-0">
+                            <li><i class="bi bi-infinity"></i>Truy cập trọn đời</li>
+                            <li><i class="bi bi-phone"></i>Học mọi thiết bị, mọi nơi</li>
+                            <li><i class="bi bi-file-earmark-text"></i>Tài liệu học tập đính kèm</li>
+                            <li><i class="bi bi-award"></i>Chứng chỉ hoàn thành</li>
+                        </ul>
+
+                        <div class="divider"></div>
+
+                        <!-- Lưu ý -->
+                        <ul class="note-list">
+                            <li><i class="bi bi-info-circle"></i>Sau khi đăng ký, bạn cần chờ admin duyệt để bắt đầu học</li>
+                            <li><i class="bi bi-envelope"></i>Bạn sẽ nhận được thông báo qua email khi được duyệt</li>
+                            <li><i class="bi bi-check2-all"></i>Có thể truy cập khóa học bất kỳ lúc nào sau khi được duyệt</li>
+                        </ul>
+
+                        <a href="/courses/" class="back-link">
+                            <i class="bi bi-arrow-left me-1"></i>Quay lại danh sách
+                        </a>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /CỘT PHẢI -->
+
+    </div>
+</div>
+
+{% endblock %}

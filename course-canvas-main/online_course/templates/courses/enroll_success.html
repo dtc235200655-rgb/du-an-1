@@ -1,0 +1,142 @@
+    <!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng ký thành công - Online Courses</title>
+    
+    <!-- Bootstrap 5 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <style>
+        .success-container {
+            min-height: 80vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .success-card {
+            max-width: 600px;
+            padding: 3rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .success-icon {
+            font-size: 5rem;
+            color: #198754;
+            animation: scaleIn 0.5s ease-out;
+        }
+        
+        @keyframes scaleIn {
+            0% {
+                transform: scale(0);
+            }
+            50% {
+                transform: scale(1.2);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        
+        .course-title-box {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid #0d6efd;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ========== NAVBAR ========== -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="/">
+            <i class="bi bi-book me-2"></i>Online Courses
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/courses/">Courses</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/login/">Login</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/register/">Register</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<!-- ========== END NAVBAR ========== -->
+
+<div class="success-container">
+    <div class="container">
+        <div class="success-card mx-auto text-center bg-white">
+            
+            <!-- Icon thành công -->
+            <div class="success-icon mb-4">
+                <i class="bi bi-check-circle-fill"></i>
+            </div>
+            
+            <!-- Tiêu đề -->
+            <h2 class="text-success fw-bold mb-3">
+                Đăng ký thành công! 🎉
+            </h2>
+            
+            <!-- Thông tin khóa học -->
+            <p class="text-muted mb-4">
+                Bạn đã đăng ký khóa học:
+            </p>
+            
+            <div class="course-title-box mb-4">
+                <h4 class="fw-bold mb-0 text-primary">{{ course.title }}</h4>
+            </div>
+            
+            <!-- Hướng dẫn tiếp theo -->
+            <div class="alert alert-info" role="alert">
+                <i class="bi bi-info-circle-fill me-2"></i>
+                <strong>Bước tiếp theo:</strong>
+                <p class="mb-0 mt-2">
+                    Vui lòng chờ admin phê duyệt đăng ký của bạn. 
+                    Bạn sẽ nhận được thông báo qua email khi đăng ký được duyệt.
+                </p>
+            </div>
+            
+            <!-- Nút hành động -->
+            <div class="d-grid gap-2 mt-4">
+                <a href="/courses/" class="btn btn-primary btn-lg">
+                    <i class="bi bi-arrow-left me-2"></i>Xem thêm khóa học khác
+                </a>
+                <a href="/" class="btn btn-outline-secondary">
+                    <i class="bi bi-house-door me-2"></i>Về trang chủ
+                </a>
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+<!-- ========== FOOTER ========== -->
+<footer class="bg-dark text-white py-4">
+    <div class="container text-center">
+        <p class="mb-0">&copy; 2024 Online Courses. All rights reserved.</p>
+    </div>
+</footer>
+<!-- ========== END FOOTER ========== -->
+
+<!-- Bootstrap 5 JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
