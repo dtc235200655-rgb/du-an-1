@@ -55,7 +55,7 @@
                             {% if messages %}
                                 {% for message in messages %}
                                 <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                                    {{ message }}
+                                    {{ message|safe }}
                                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                                 </div>
                                 {% endfor %}
@@ -67,19 +67,22 @@
                                 
                                 <!-- Role Selection -->
                                 <div class="mb-3">
-                                    <label for="role" class="form-label">Tôi là:</label>
+                                    <label for="role" class="form-label">
+                                        <strong>Tôi là:</strong>
+                                        <span class="text-muted small">(Vui lòng chọn đúng vai trò của bạn)</span>
+                                    </label>
                                     <div class="row g-2">
                                         {% for role_value, role_display in role_choices %}
                                         <div class="col-md-4">
-                                            <div class="form-check card h-100">
-                                                <div class="card-body p-3">
+                                            <div class="form-check card h-100 border-2">
+                                                <div class="card-body p-3 text-center">
                                                     <input type="radio" 
-                                                           class="form-check-input" 
+                                                           class="form-check-input float-none" 
                                                            id="role_{{ role_value }}" 
                                                            name="role" 
                                                            value="{{ role_value }}"
                                                            {% if selected_role == role_value %}checked{% endif %}>
-                                                    <label class="form-check-label w-100 text-center" for="role_{{ role_value }}">
+                                                    <label class="form-check-label w-100" for="role_{{ role_value }}">
                                                         <div class="mb-2">
                                                             {% if role_value == 'admin' %}
                                                                 <i class="bi bi-shield-lock display-4 text-danger"></i>
@@ -89,12 +92,26 @@
                                                                 <i class="bi bi-person display-4 text-success"></i>
                                                             {% endif %}
                                                         </div>
-                                                        <h6 class="mb-0">{{ role_display }}</h6>
+                                                        <h6 class="mb-1 fw-bold">{{ role_display }}</h6>
+                                                        <small class="text-muted d-block">
+                                                            {% if role_value == 'admin' %}
+                                                                Quản trị hệ thống
+                                                            {% elif role_value == 'staff' %}
+                                                                Quản lý khóa học
+                                                            {% else %}
+                                                                Học viên
+                                                            {% endif %}
+                                                        </small>
                                                     </label>
                                                 </div>
                                             </div>
                                         </div>
                                         {% endfor %}
+                                    </div>
+                                    <div class="form-text mt-2">
+                                        <i class="bi bi-info-circle me-1"></i>
+                                        <strong>Lưu ý:</strong> Bạn phải chọn đúng vai trò của tài khoản để đăng nhập. 
+                                        Nếu không chắc, vui lòng liên hệ quản trị viên.
                                     </div>
                                 </div>
                                 

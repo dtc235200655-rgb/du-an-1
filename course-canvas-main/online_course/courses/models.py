@@ -58,10 +58,10 @@ class UserRole(models.Model):
         """Trả về URL redirect sau khi đăng nhập theo vai trò"""
         redirect_urls = {
             'admin': '/admin/',
-            'staff': '/staff/dashboard/',
-            'customer': '/dashboard/',
+            'staff': '/courses/staff/dashboard/',
+            'customer': '/courses/dashboard/',
         }
-        return redirect_urls.get(self.role, '/dashboard/')
+        return redirect_urls.get(self.role, '/courses/dashboard/')
 
 
 class StaffProfile(models.Model):

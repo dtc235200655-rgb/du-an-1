@@ -55,70 +55,156 @@
                             {% if messages %}
                                 {% for message in messages %}
                                 <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                                    {{ message }}
+                                    {{ message|safe }}
                                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                                 </div>
                                 {% endfor %}
                             {% endif %}
                             
+                            <!-- Field-level errors -->
+                            {% if form_errors %}
+                                {% for field, errors in form_errors.items %}
+                                    {% for error in errors %}
+                                    <div class="alert alert-danger alert-dismissible fade show mb-2" role="alert">
+                                        <i class="bi bi-exclamation-triangle me-2"></i>
+                                        <strong>{{ field }}:</strong> {{ error }}
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                    </div>
+                                    {% endfor %}
+                                {% endfor %}
+                            {% endif %}
+                            
                             <!-- Register Form - ĐÃ SỬA CSRF -->
-                            <form method="POST" action="{% url 'register' %}">
+                            <form method="POST" action="{% url 'register' %}" novalidate>
                                 {% csrf_token %}
                                 
                                 <!-- Username Field -->
                                 <div class="mb-3">
-                                    <label for="username" class="form-label">Username</label>
-                                    <div class="input-group">
+                                    <label for="username" class="form-label">
+                                        <i class="bi bi-person me-1"></i>Tên đăng nhập
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group has-validation">
                                         <span class="input-group-text"><i class="bi bi-person"></i></span>
-                                        <input type="text" class="form-control" id="username" name="username" placeholder="Choose a username" required>
+                                        <input type="text" 
+                                               class="form-control {% if form_errors and 'username' in form_errors %}is-invalid{% endif %}" 
+                                               id="username" 
+                                               name="username" 
+                                               placeholder="Chọn tên đăng nhập (4-50 ký tự)" 
+                                               value="{{ form_data.username|default:'' }}"
+                                               required
+                                               minlength="4"
+                                               maxlength="50"
+                                               pattern="[a-zA-Z0-9_]+">
+                                        {% if form_errors and 'username' in form_errors %}
+                                        <div class="invalid-feedback">
+                                            {{ form_errors.username|first }}
+                                        </div>
+                                        {% endif %}
                                     </div>
+                                    <div class="form-text">Chỉ dùng chữ, số và dấu gạch dưới. Không được trùng với người dùng khác.</div>
                                 </div>
                                 
                                 <!-- Email Field -->
                                 <div class="mb-3">
-                                    <label for="email" class="form-label">Email Address</label>
-                                    <div class="input-group">
+                                    <label for="email" class="form-label">
+                                        <i class="bi bi-envelope me-1"></i>Email
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group has-validation">
                                         <span class="input-group-text"><i class="bi bi-envelope"></i></span>
-                                        <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email" required>
+                                        <input type="email" 
+                                               class="form-control {% if form_errors and 'email' in form_errors %}is-invalid{% endif %}" 
+                                               id="email" 
+                                               name="email" 
+                                               placeholder="nh@example.com" 
+                                               value="{{ form_data.email|default:'' }}"
+                                               required>
+                                        {% if form_errors and 'email' in form_errors %}
+                                        <div class="invalid-feedback">
+                                            {{ form_errors.email|first }}
+                                        </div>
+                                        {% endif %}
                                     </div>
+                                    <div class="form-text">Email hợp lệ. Không được trùng với email đã đăng ký.</div>
                                 </div>
                                 
                                 <!-- Password Field -->
                                 <div class="mb-3">
-                                    <label for="password" class="form-label">Password</label>
-                                    <div class="input-group">
+                                    <label for="password" class="form-label">
+                                        <i class="bi bi-lock me-1"></i>Mật khẩu
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group has-validation">
                                         <span class="input-group-text"><i class="bi bi-lock"></i></span>
-                                        <input type="password" class="form-control" id="password" name="password" placeholder="Create a password" required>
+                                        <input type="password" 
+                                               class="form-control {% if form_errors and 'password' in form_errors %}is-invalid{% endif %}" 
+                                               id="password" 
+                                               name="password" 
+                                               placeholder="Tạo mật khẩu (tối thiểu 8 ký tự)" 
+                                               required
+                                               minlength="8">
+                                        {% if form_errors and 'password' in form_errors %}
+                                        <div class="invalid-feedback">
+                                            {{ form_errors.password|first }}
+                                        </div>
+                                        {% endif %}
                                     </div>
-                                    <div class="form-text">Password must be at least 8 characters.</div>
+                                    <div class="form-text">Mật khẩu phải có ít nhất 8 ký tự. Nên dùng chữ hoa, thường, số và ký tự đặc biệt.</div>
                                 </div>
                                 
                                 <!-- Confirm Password Field -->
                                 <div class="mb-3">
-                                    <label for="confirm_password" class="form-label">Confirm Password</label>
-                                    <div class="input-group">
+                                    <label for="confirm_password" class="form-label">
+                                        <i class="bi bi-lock-fill me-1"></i>Xác nhận mật khẩu
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group has-validation">
                                         <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
-                                        <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Confirm your password" required>
+                                        <input type="password" 
+                                               class="form-control {% if form_errors and 'confirm_password' in form_errors %}is-invalid{% endif %}" 
+                                               id="confirm_password" 
+                                               name="confirm_password" 
+                                               placeholder="Nhập lại mật khẩu" 
+                                               required>
+                                        {% if form_errors and 'confirm_password' in form_errors %}
+                                        <div class="invalid-feedback">
+                                            {{ form_errors.confirm_password|first }}
+                                        </div>
+                                        {% endif %}
                                     </div>
+                                    <div class="form-text">Phải giống với mật khẩu ở trên.</div>
                                 </div>
                                 
                                 <!-- Terms Checkbox -->
                                 <div class="mb-3 form-check">
-                                    <input type="checkbox" class="form-check-input" id="terms" name="terms" required>
-                                    <label class="form-check-label" for="terms">I agree to the <a href="#" class="text-decoration-none">Terms of Service</a> and <a href="#" class="text-decoration-none">Privacy Policy</a></label>
+                                    <input type="checkbox" 
+                                           class="form-check-input {% if form_errors and 'terms' in form_errors %}is-invalid{% endif %}" 
+                                           id="terms" 
+                                           name="terms" 
+                                           required>
+                                    <label class="form-check-label" for="terms">
+                                        Tôi đồng ý với <a href="#" class="text-decoration-none">Điều khoản dịch vụ</a> và <a href="#" class="text-decoration-none">Chính sách bảo mật</a>
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    {% if form_errors and 'terms' in form_errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form_errors.terms|first }}
+                                    </div>
+                                    {% endif %}
                                 </div>
                                 
                                 <!-- Register Button -->
                                 <button type="submit" class="btn btn-primary w-100 mb-3">
-                                    <i class="bi bi-person-plus me-2"></i>Register
+                                    <i class="bi bi-person-plus me-2"></i>Đăng ký ngay
                                 </button>
                             </form>
                             
-                            <hr class="my-4">
+                            <hr class="my-4"/>
                             
                             <!-- Login Link -->
                             <div class="text-center">
-                                <p class="mb-0">Already have an account? <a href="/login/" class="text-decoration-none fw-bold">Login here</a></p>
+                                <p class="mb-0 text-muted">Đã có tài khoản? <a href="/login/" class="text-decoration-none fw-bold">Đăng nhập tại đây</a></p>
                             </div>
                         </div>
                     </article>
