@@ -1,7 +1,142 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db.models import Avg
+
+
+# =============================
+#⭐ MODEL NHÂN VIÊN (STAFF)
+# =============================
+
+# =============================
+# ⭐ MODEL VAI TRÒ NGƯỜI DÙNG
+# =============================
+
+class UserRole(models.Model):
+    """Model lưu trữ vai trò người dùng"""
+    
+    ROLE_CHOICES = [
+        ('admin', 'Quản trị viên'),
+        ('staff', 'Nhân viên'),
+        ('customer', 'Khách hàng'),
+    ]
+    
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        related_name='user_role',
+        verbose_name="Người dùng"
+    )
+    
+    role = models.CharField(
+        max_length=20,
+        choices=ROLE_CHOICES,
+        default='customer',
+        verbose_name="Vai trò"
+    )
+    
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Ngày tạo")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Ngày cập nhật")
+    
+    class Meta:
+        verbose_name = "Vai trò người dùng"
+        verbose_name_plural = "Vai trò người dùng"
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.get_role_display()}"
+    
+    def get_role_badge_class(self):
+        """Trả về class badge CSS cho từng vai trò"""
+        badge_classes = {
+            'admin': 'bg-danger',
+            'staff': 'bg-primary',
+            'customer': 'bg-success',
+        }
+        return badge_classes.get(self.role, 'bg-secondary')
+    
+    def get_role_redirect_url(self):
+        """Trả về URL redirect sau khi đăng nhập theo vai trò"""
+        redirect_urls = {
+            'admin': '/admin/',
+            'staff': '/staff/dashboard/',
+            'customer': '/dashboard/',
+        }
+        return redirect_urls.get(self.role, '/dashboard/')
+
+
+class StaffProfile(models.Model):
+    """Hồ sơ nhân viên mở rộng User model"""
+    
+    ROLE_CHOICES = [
+        ('course_manager', 'Quản lý khóa học'),
+        ('enrollment_manager', 'Quản lý đăng ký'),
+        ('review_manager', 'Quản lý đánh giá'),
+        ('content_manager', 'Quản lý nội dung'),
+        ('super_staff', 'Nhân viên cấp cao'),
+    ]
+    
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        related_name='staff_profile',
+        verbose_name="Tài khoản người dùng"
+    )
+    
+    role = models.CharField(
+        max_length=50,
+        choices=ROLE_CHOICES,
+        verbose_name="Vai trò"
+    )
+    
+    phone = models.CharField(
+        max_length=20,
+        blank=True,
+        verbose_name="Số điện thoại"
+    )
+    
+    department = models.CharField(
+        max_length=100,
+        blank=True,
+        verbose_name="Bộ phận"
+    )
+    
+    is_active = models.BooleanField(
+        default=True,
+        verbose_name="Đang làm việc"
+    )
+    
+    hire_date = models.DateField(
+        auto_now_add=True,
+        verbose_name="Ngày vào làm"
+    )
+    
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Ngày tạo")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Ngày cập nhật")
+    
+    class Meta:
+        verbose_name = "Hồ sơ nhân viên"
+        verbose_name_plural = "Hồ sơ nhân viên"
+        permissions = [
+            ("can_manage_courses", "Có thể quản lý khóa học"),
+            ("can_manage_enrollments", "Có thể quản lý đăng ký học"),
+            ("can_manage_reviews", "Có thể quản lý đánh giá"),
+            ("can_manage_content", "Có thể quản lý nội dung"),
+            ("can_view_reports", "Có thể xem báo cáo"),
+        ]
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.get_role_display()}"
+    
+    def get_role_badge(self):
+        """Trả về badge màu sắc cho vai trò"""
+        role_colors = {
+            'course_manager': 'primary',
+            'enrollment_manager': 'success',
+            'review_manager': 'warning',
+            'content_manager': 'info',
+            'super_staff': 'danger',
+        }
+        return role_colors.get(self.role, 'secondary')
 
 
 class Category(models.Model):

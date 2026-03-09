@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block title %}Quản lý Nhân viên - Online Courses{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">
+                <i class="bi bi-people me-2"></i>Quản lý Nhân viên
+                <a href="{% url 'courses:create_staff' %}" class="btn btn-success float-end">
+                    <i class="bi bi-plus-circle me-1"></i>Thêm nhân viên
+                </a>
+            </h1>
+            
+            {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                {% endfor %}
+            {% endif %}
+            
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Nhân viên</th>
+                                    <th>Vai trò</th>
+                                    <th>Bộ phận</th>
+                                    <th>Liên hệ</th>
+                                    <th>Trạng thái</th>
+                                    <th>Ngày vào làm</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for profile in staff_profiles %}
+                                <tr>
+                                    <td>
+                                        <div>
+                                            <strong>{{ profile.user.username }}</strong>
+                                            <br>
+                                            <small class="text-muted">{{ profile.user.get_full_name|default:"Chưa cập nhật" }}</small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-{{ profile.get_role_badge }}">
+                                            {{ profile.get_role_display }}
+                                        </span>
+                                    </td>
+                                    <td>{{ profile.department|default:"Chưa cập nhật" }}</td>
+                                    <td>
+                                        <small>
+                                            <i class="bi bi-envelope me-1"></i>{{ profile.user.email }}
+                                            <br>
+                                            {% if profile.phone %}
+                                            <i class="bi bi-telephone me-1"></i>{{ profile.phone }}
+                                            {% endif %}
+                                        </small>
+                                    </td>
+                                    <td>
+                                        {% if profile.is_active %}
+                                        <span class="badge bg-success">Đang làm việc</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">Tạm ngưng</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ profile.hire_date|date:"d/m/Y" }}</td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            {% if profile.is_active %}
+                                            <form method="POST" style="display: inline;">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="profile_id" value="{{ profile.id }}">
+                                                <input type="hidden" name="action" value="deactivate">
+                                                <button type="submit" class="btn btn-sm btn-warning" 
+                                                        onclick="return confirm('Vô hiệu hóa nhân viên này?')">
+                                                    <i class="bi bi-x-circle"></i>
+                                                </button>
+                                            </form>
+                                            {% else %}
+                                            <form method="POST" style="display: inline;">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="profile_id" value="{{ profile.id }}">
+                                                <input type="hidden" name="action" value="activate">
+                                                <button type="submit" class="btn btn-sm btn-success">
+                                                    <i class="bi bi-check-circle"></i>
+                                                </button>
+                                            </form>
+                                            {% endif %}
+                                            
+                                            <form method="POST" style="display: inline;">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="profile_id" value="{{ profile.id }}">
+                                                <input type="hidden" name="action" value="delete">
+                                                <button type="submit" class="btn btn-sm btn-danger" 
+                                                        onclick="return confirm('Xóa vĩnh viễn nhân viên này? Hành động không thể hoàn tác!')">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="7" class="text-center py-5">
+                                        <i class="bi bi-people display-4 text-muted mb-3"></i>
+                                        <h4 class="text-muted">Chưa có nhân viên nào</h4>
+                                        <p class="text-muted">Hãy tạo nhân viên đầu tiên</p>
+                                        <a href="{% url 'courses:create_staff' %}" class="btn btn-primary">
+                                            <i class="bi bi-plus-circle me-2"></i>Tạo nhân viên
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

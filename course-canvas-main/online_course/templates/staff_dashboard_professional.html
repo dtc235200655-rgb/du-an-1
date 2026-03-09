@@ -1,0 +1,654 @@
+{% extends "base.html" %}
+
+{% block title %}Staff Dashboard - Online Courses{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-color: #4361ee;
+        --secondary-color: #3f37c9;
+        --success-color: #4cc9f0;
+        --warning-color: #f72585;
+        --dark-color: #1d3557;
+        --light-color: #f8f9fa;
+    }
+
+    /* ========== DASHBOARD HEADER ========== */
+    .dashboard-header {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        color: white;
+        padding: 3rem 0;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .dashboard-header::before {
+        content: "";
+        position: absolute;
+        top: -50px;
+        right: -50px;
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .dashboard-header::after {
+        content: "";
+        position: absolute;
+        bottom: -80px;
+        left: -30px;
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.08);
+    }
+
+    .dashboard-header-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .dashboard-header h1 {
+        font-weight: 700;
+        font-size: 2.5rem;
+        letter-spacing: -1px;
+        margin-bottom: 1rem;
+    }
+
+    .dashboard-header p {
+        font-size: 1.15rem;
+        opacity: 0.9;
+        font-weight: 400;
+        margin-bottom: 0;
+    }
+
+    /* ========== STATISTICS CARDS ========== */
+    .stat-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border: none;
+        transition: all 0.3s ease;
+        overflow: hidden;
+        height: 100%;
+        position: relative;
+    }
+
+    .stat-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
+    }
+
+    .stat-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+    }
+
+    .stat-card .card-body {
+        padding: 1.75rem;
+    }
+
+    .stat-icon-container {
+        width: 60px;
+        height: 60px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        margin-bottom: 1.25rem;
+        color: white;
+    }
+
+    .icon-primary {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    }
+
+    .icon-success {
+        background: linear-gradient(135deg, #06d6a0, #118ab2);
+    }
+
+    .icon-warning {
+        background: linear-gradient(135deg, #ff9e00, #ff5400);
+    }
+
+    .icon-info {
+        background: linear-gradient(135deg, #4cc9f0, #4361ee);
+    }
+
+    .stat-title {
+        font-size: 0.95rem;
+        color: #6c757d;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .stat-value {
+        font-size: 2.2rem;
+        font-weight: 700;
+        color: var(--dark-color);
+        margin-bottom: 0.25rem;
+        letter-spacing: -1px;
+    }
+
+    .stat-trend {
+        display: flex;
+        align-items: center;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+
+    .trend-up {
+        color: #06d6a0;
+    }
+
+    .trend-down {
+        color: #ef476f;
+    }
+
+    /* ========== QUICK ACTIONS ========== */
+    .quick-actions-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border: none;
+        padding: 1.75rem;
+        margin-bottom: 1.75rem;
+    }
+
+    .quick-actions-card h5 {
+        font-weight: 600;
+        color: var(--dark-color);
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .quick-action-btn {
+        border-radius: 12px;
+        padding: 0.85rem 1.5rem;
+        font-weight: 500;
+        margin: 0.35rem;
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .quick-action-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-outline-primary:hover {
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+        color: white;
+    }
+
+    .btn-outline-success:hover {
+        background: #28a745;
+        border-color: #28a745;
+        color: white;
+    }
+
+    .btn-outline-warning:hover {
+        background: #ffc107;
+        border-color: #ffc107;
+        color: #212529;
+    }
+
+    .btn-outline-danger:hover {
+        background: #dc3545;
+        border-color: #dc3545;
+        color: white;
+    }
+
+    .btn-outline-secondary:hover {
+        background: #6c757d;
+        border-color: #6c757d;
+        color: white;
+    }
+
+    /* ========== PENDING ITEMS ========== */
+    .pending-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border: none;
+        margin-bottom: 1.75rem;
+        overflow: hidden;
+    }
+
+    .pending-card-header {
+        background: #f8f9fa;
+        border-bottom: 1px solid #e9ecef;
+        padding: 1.25rem 1.75rem;
+    }
+
+    .pending-card-header h5 {
+        font-weight: 600;
+        color: var(--dark-color);
+        margin: 0;
+        display: flex;
+        align-items: center;
+    }
+
+    .pending-card-body {
+        padding: 1.75rem;
+    }
+
+    .pending-item {
+        border-left: 3px solid #ffc107;
+        padding: 1.25rem 1.5rem;
+        margin-bottom: 1.25rem;
+        background: #fff9e6;
+        border-radius: 0 8px 8px 0;
+        transition: all 0.3s ease;
+    }
+
+    .pending-item:hover {
+        background: #fff3cd;
+        transform: translateX(5px);
+    }
+
+    .pending-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .pending-item h6 {
+        color: var(--dark-color);
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .pending-item small {
+        color: #6c757d;
+        font-weight: 400;
+    }
+
+    .pending-item .btn-sm {
+        margin-top: 0.75rem;
+        border-radius: 8px;
+        font-weight: 500;
+        padding: 0.35rem 0.75rem;
+    }
+
+    /* ========== PERMISSIONS CARD ========== */
+    .permissions-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border: none;
+        overflow: hidden;
+    }
+
+    .permissions-card-header {
+        background: linear-gradient(135deg, #6c757d, #495057);
+        color: white;
+        padding: 1.5rem 1.75rem;
+    }
+
+    .permissions-card-header h5 {
+        margin: 0;
+        display: flex;
+        align-items: center;
+        font-weight: 600;
+    }
+
+    .permissions-card-body {
+        padding: 1.75rem;
+    }
+
+    .permissions-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .permission-section h6 {
+        font-weight: 600;
+        color: var(--dark-color);
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #e9ecef;
+    }
+
+    .permission-list {
+        list-style: none;
+    }
+
+    .permission-list li {
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .permission-list li i {
+        margin-right: 0.75rem;
+        font-size: 1.1rem;
+    }
+
+    .permission-list li .text-success i {
+        color: #28a745;
+    }
+
+    .user-info p {
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .user-info strong {
+        min-width: 120px;
+        color: var(--dark-color);
+    }
+
+    .user-info .badge {
+        font-size: 0.85rem;
+        padding: 0.4rem 0.8rem;
+        font-weight: 500;
+    }
+
+    /* ========== RESPONSIVE ========== */
+    @media (max-width: 768px) {
+        .dashboard-header h1 {
+            font-size: 2rem;
+        }
+        
+        .dashboard-header p {
+            font-size: 1rem;
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+        }
+        
+        .quick-action-btn {
+            width: 100%;
+            margin: 0.25rem 0;
+        }
+        
+        .permissions-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .stat-card .card-body {
+            padding: 1.25rem;
+        }
+        
+        .pending-card-body,
+        .permissions-card-body {
+            padding: 1.25rem;
+        }
+        
+        .quick-actions-card {
+            padding: 1.25rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- ========== DASHBOARD HEADER ========== -->
+<div class="dashboard-header">
+    <div class="container">
+        <div class="dashboard-header-content">
+            <h1><i class="bi bi-person-workspace me-3"></i>Staff Dashboard</h1>
+            <p>
+                <i class="bi bi-person-badge me-2"></i>
+                Xin chào {{ request.user.get_full_name|default:request.user.username }} 
+                {% if request.user.staff_profile %}
+                    <span class="badge bg-light text-dark ms-2">
+                        {{ request.user.staff_profile.get_role_display }}
+                    </span>
+                {% endif %}
+            </p>
+        </div>
+    </div>
+</div>
+
+<main class="container py-4">
+    
+    <!-- ========== STATISTICS CARDS ========== -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-6 col-lg-3">
+            <div class="stat-card">
+                <div class="card-body">
+                    <div class="stat-icon-container icon-primary">
+                        <i class="bi bi-book"></i>
+                    </div>
+                    <div class="stat-title">Tổng khóa học</div>
+                    <div class="stat-value">{{ stats.total_courses }}</div>
+                    <div class="stat-trend trend-up">
+                        <i class="bi bi-arrow-up me-1"></i>
+                        <span>Khóa học đã tạo</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="stat-card">
+                <div class="card-body">
+                    <div class="stat-icon-container icon-warning">
+                        <i class="bi bi-clock-history"></i>
+                    </div>
+                    <div class="stat-title">Chờ duyệt khóa học</div>
+                    <div class="stat-value text-warning">
+                        {{ stats.pending_courses }}
+                    </div>
+                    <div class="stat-trend trend-down">
+                        <i class="bi bi-arrow-down me-1"></i>
+                        <span>Cần xử lý ngay</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="stat-card">
+                <div class="card-body">
+                    <div class="stat-icon-container icon-info">
+                        <i class="bi bi-person-plus"></i>
+                    </div>
+                    <div class="stat-title">Chờ duyệt đăng ký</div>
+                    <div class="stat-value text-info">
+                        {{ stats.pending_enrollments }}
+                    </div>
+                    <div class="stat-trend trend-up">
+                        <i class="bi bi-arrow-up me-1"></i>
+                        <span>Đăng ký mới</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="stat-card">
+                <div class="card-body">
+                    <div class="stat-icon-container icon-success">
+                        <i class="bi bi-star"></i>
+                    </div>
+                    <div class="stat-title">Tổng đánh giá</div>
+                    <div class="stat-value text-success">{{ stats.total_reviews }}</div>
+                    <div class="stat-trend trend-up">
+                        <i class="bi bi-arrow-up me-1"></i>
+                        <span>Đánh giá mới</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== QUICK ACTIONS ========== -->
+    <div class="quick-actions-card">
+        <h5>
+            <i class="bi bi-lightning-charge text-warning me-2"></i>Thao tác nhanh
+        </h5>
+        <div class="d-flex flex-wrap gap-2 justify-content-center">
+            {% if has_course_perm %}
+            <a href="/admin/courses/course/" class="btn btn-outline-primary quick-action-btn">
+                <i class="bi bi-book me-2"></i>Quản lý khóa học
+            </a>
+            {% endif %}
+            
+            {% if has_enrollment_perm %}
+            <a href="/admin/courses/enrollment/" class="btn btn-outline-success quick-action-btn">
+                <i class="bi bi-person-check me-2"></i>Quản lý đăng ký
+            </a>
+            {% endif %}
+            
+            {% if has_review_perm %}
+            <a href="/admin/courses/review/" class="btn btn-outline-warning quick-action-btn">
+                <i class="bi bi-star me-2"></i>Quản lý đánh giá
+            </a>
+            {% endif %}
+            
+            {% if is_super_staff %}
+            <a href="{% url 'courses:staff_management' %}" class="btn btn-outline-danger quick-action-btn">
+                <i class="bi bi-people me-2"></i>Quản lý nhân viên
+            </a>
+            {% endif %}
+            
+            <a href="/admin/" class="btn btn-outline-secondary quick-action-btn">
+                <i class="bi bi-gear me-2"></i>Admin Panel
+            </a>
+        </div>
+    </div>
+
+    <!-- ========== PENDING ITEMS ========== -->
+    <div class="row">
+        {% if has_course_perm and recent_courses %}
+        <div class="col-md-6">
+            <div class="pending-card">
+                <div class="pending-card-header">
+                    <h5>
+                        <i class="bi bi-clock-history text-warning me-2"></i>Khóa học chờ duyệt
+                    </h5>
+                </div>
+                <div class="pending-card-body">
+                    {% for course in recent_courses %}
+                    <div class="pending-item">
+                        <h6>{{ course.title }}</h6>
+                        <small>
+                            <i class="bi bi-person me-1"></i>Bởi: {{ course.created_by.username }} | 
+                            <i class="bi bi-calendar me-1"></i>{{ course.created_at|date:"d/m/Y H:i" }}
+                        </small>
+                        <div>
+                            <a href="/admin/courses/course/{{ course.id }}/change/" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-eye me-1"></i>Xem chi tiết
+                            </a>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center py-4">
+                        <i class="bi bi-check-circle text-success fs-1 mb-3"></i>
+                        <p class="text-muted">Không có khóa học chờ duyệt</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        {% if has_enrollment_perm and recent_enrollments %}
+        <div class="col-md-6">
+            <div class="pending-card">
+                <div class="pending-card-header">
+                    <h5>
+                        <i class="bi bi-person-plus text-info me-2"></i>Đăng ký chờ duyệt
+                    </h5>
+                </div>
+                <div class="pending-card-body">
+                    {% for enrollment in recent_enrollments %}
+                    <div class="pending-item">
+                        <h6>{{ enrollment.course.title }}</h6>
+                        <small>
+                            <i class="bi bi-person me-1"></i>Học viên: {{ enrollment.user.username }} | 
+                            <i class="bi bi-calendar me-1"></i>{{ enrollment.created_at|date:"d/m/Y H:i" }}
+                        </small>
+                        <div>
+                            <a href="/admin/courses/enrollment/{{ enrollment.id }}/change/" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-eye me-1"></i>Xem chi tiết
+                            </a>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center py-4">
+                        <i class="bi bi-check-circle text-success fs-1 mb-3"></i>
+                        <p class="text-muted">Không có đăng ký chờ duyệt</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- ========== PERMISSIONS INFO ========== -->
+    <div class="permissions-card">
+        <div class="permissions-card-header">
+            <h5>
+                <i class="bi bi-shield-lock me-2"></i>Thông tin quyền hạn & cá nhân
+            </h5>
+        </div>
+        <div class="permissions-card-body">
+            <div class="permissions-grid">
+                <div class="permission-section">
+                    <h6><i class="bi bi-key me-2"></i>Vai trò & quyền hạn</h6>
+                    <ul class="permission-list">
+                        {% if has_course_perm %}
+                        <li><i class="bi bi-check-circle text-success me-2"></i>Quản lý khóa học</li>
+                        {% endif %}
+                        {% if has_enrollment_perm %}
+                        <li><i class="bi bi-check-circle text-success me-2"></i>Quản lý đăng ký học</li>
+                        {% endif %}
+                        {% if has_review_perm %}
+                        <li><i class="bi bi-check-circle text-success me-2"></i>Quản lý đánh giá</li>
+                        {% endif %}
+                        {% if is_super_staff %}
+                        <li><i class="bi bi-check-circle text-success me-2"></i>Quản lý nhân viên</li>
+                        <li><i class="bi bi-check-circle text-success me-2"></i>Truy cập Admin Panel đầy đủ</li>
+                        {% endif %}
+                        {% if not has_course_perm and not has_enrollment_perm and not has_review_perm and not is_super_staff %}
+                        <li><i class="bi bi-info-circle text-info me-2"></i>Liên hệ admin để cấp quyền</li>
+                        {% endif %}
+                    </ul>
+                </div>
+                
+                <div class="permission-section">
+                    <h6><i class="bi bi-person-circle me-2"></i>Thông tin cá nhân</h6>
+                    <div class="user-info">
+                        <p><strong><i class="bi bi-person me-2"></i>Tên đăng nhập:</strong> {{ request.user.username }}</p>
+                        <p><strong><i class="bi bi-envelope me-2"></i>Email:</strong> {{ request.user.email|default:"Chưa cập nhật" }}</p>
+                        {% if request.user.staff_profile %}
+                        <p><strong><i class="bi bi-briefcase me-2"></i>Vai trò:</strong> 
+                            <span class="badge bg-{{ request.user.staff_profile.get_role_badge_class }}">
+                                {{ request.user.staff_profile.get_role_display }}
+                            </span>
+                        </p>
+                        <p><strong><i class="bi bi-building me-2"></i>Bộ phận:</strong> {{ request.user.staff_profile.department|default:"Chưa cập nhật" }}</p>
+                        <p><strong><i class="bi bi-telephone me-2"></i>Số điện thoại:</strong> {{ request.user.staff_profile.phone|default:"Chưa cập nhật" }}</p>
+                        {% endif %}
+                        <p><strong><i class="bi bi-calendar-check me-2"></i>Ngày tham gia:</strong> {{ request.user.date_joined|date:"d/m/Y" }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</main>
+{% endblock %}

@@ -1,0 +1,330 @@
+<!-- 
+    Professional Role Selection Component
+    Usage: Include this HTML snippet in your login page
+    Dependencies: Bootstrap 5, Bootstrap Icons, Google Fonts (Inter)
+-->
+
+<!-- Role Selection Styles -->
+<style>
+.role-selector-enhanced {
+    margin: 2rem 0;
+    padding: 2rem;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 20px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+}
+
+.role-selector-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.role-selector-header h4 {
+    color: #2c3e50;
+    font-weight: 700;
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+}
+
+.role-selector-header p {
+    color: #7f8c8d;
+    font-size: 1rem;
+    margin: 0;
+}
+
+.role-options-enhanced {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.role-option-enhanced {
+    position: relative;
+}
+
+.role-input-enhanced {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.role-card-enhanced {
+    background: white;
+    border: 2px solid #e9ecef;
+    border-radius: 16px;
+    padding: 1.75rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    position: relative;
+    overflow: hidden;
+}
+
+.role-card-enhanced::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.6s ease;
+}
+
+.role-card-enhanced:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+}
+
+.role-card-enhanced:hover::before {
+    transform: translateX(100%);
+}
+
+.role-input-enhanced:checked + .role-card-enhanced {
+    border-color: #4361ee;
+    box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2), 0 10px 25px rgba(67, 97, 238, 0.2);
+    transform: translateY(-5px) scale(1.03);
+}
+
+.role-input-enhanced:checked + .role-card-enhanced::after {
+    content: "✓";
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 22px;
+    height: 22px;
+    background: #4361ee;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.role-icon-enhanced {
+    width: 65px;
+    height: 65px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.25rem;
+    font-size: 1.8rem;
+    color: white;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    transition: all 0.4s ease;
+}
+
+.role-card-enhanced:hover .role-icon-enhanced {
+    transform: scale(1.15) rotate(8deg);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.role-icon-enhanced.admin { background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%); }
+.role-icon-enhanced.staff { background: linear-gradient(135deg, #4361ee 0%, #3f37c9 100%); }
+.role-icon-enhanced.customer { background: linear-gradient(135deg, #06d6a0 0%, #118ab2 100%); }
+
+.role-title-enhanced {
+    font-weight: 700;
+    color: #2c3e50;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+}
+
+.role-desc-enhanced {
+    color: #7f8c8d;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    min-height: 40px;
+}
+
+.role-badge-enhanced {
+    display: inline-block;
+    padding: 0.3rem 0.8rem;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 1rem;
+}
+
+.badge-enhanced-admin { background: linear-gradient(135deg, #ff6b6b, #ee5a52); color: white; }
+.badge-enhanced-staff { background: linear-gradient(135deg, #4361ee, #3f37c9); color: white; }
+.badge-enhanced-customer { background: linear-gradient(135deg, #06d6a0, #118ab2); color: white; }
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .role-options-enhanced {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .role-card-enhanced {
+        padding: 1.5rem;
+    }
+    
+    .role-icon-enhanced {
+        width: 55px;
+        height: 55px;
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .role-selector-enhanced {
+        padding: 1.5rem;
+        margin: 1rem 0;
+    }
+    
+    .role-selector-header h4 {
+        font-size: 1.3rem;
+    }
+    
+    .role-card-enhanced {
+        padding: 1.25rem;
+    }
+}
+
+/* Animation keyframes */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.role-card-enhanced {
+    animation: fadeInUp 0.6s ease forwards;
+}
+
+.role-card-enhanced:nth-child(1) { animation-delay: 0.1s; }
+.role-card-enhanced:nth-child(2) { animation-delay: 0.2s; }
+.role-card-enhanced:nth-child(3) { animation-delay: 0.3s; }
+</style>
+
+<!-- Role Selection Component -->
+<div class="role-selector-enhanced">
+    <div class="role-selector-header">
+        <h4>
+            <i class="bi bi-person-badge"></i>
+            Chọn vai trò của bạn
+        </h4>
+        <p>Mỗi vai trò có quyền truy cập và tính năng khác nhau</p>
+    </div>
+    
+    <div class="role-options-enhanced">
+        <!-- ADMIN OPTION -->
+        <div class="role-option-enhanced">
+            <input type="radio" name="role" id="role-admin-enhanced" value="admin" class="role-input-enhanced">
+            <label for="role-admin-enhanced" class="role-card-enhanced">
+                <div class="role-icon-enhanced admin">
+                    <i class="bi bi-shield-lock"></i>
+                </div>
+                <div class="role-title-enhanced">Quản trị viên</div>
+                <div class="role-desc-enhanced">Toàn quyền quản lý hệ thống</div>
+                <span class="role-badge-enhanced badge-enhanced-admin">Admin</span>
+            </label>
+        </div>
+        
+        <!-- STAFF OPTION -->
+        <div class="role-option-enhanced">
+            <input type="radio" name="role" id="role-staff-enhanced" value="staff" class="role-input-enhanced" checked>
+            <label for="role-staff-enhanced" class="role-card-enhanced">
+                <div class="role-icon-enhanced staff">
+                    <i class="bi bi-person-workspace"></i>
+                </div>
+                <div class="role-title-enhanced">Nhân viên</div>
+                <div class="role-desc-enhanced">Quản lý khóa học & đăng ký</div>
+                <span class="role-badge-enhanced badge-enhanced-staff">Staff</span>
+            </label>
+        </div>
+        
+        <!-- CUSTOMER OPTION -->
+        <div class="role-option-enhanced">
+            <input type="radio" name="role" id="role-customer-enhanced" value="customer" class="role-input-enhanced">
+            <label for="role-customer-enhanced" class="role-card-enhanced">
+                <div class="role-icon-enhanced customer">
+                    <i class="bi bi-person"></i>
+                </div>
+                <div class="role-title-enhanced">Khách hàng</div>
+                <div class="role-desc-enhanced">Học tập & đánh giá</div>
+                <span class="role-badge-enhanced badge-enhanced-customer">Customer</span>
+            </label>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript for enhanced functionality -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const roleInputs = document.querySelectorAll('.role-input-enhanced');
+    const roleCards = document.querySelectorAll('.role-card-enhanced');
+    
+    // Handle role selection with enhanced feedback
+    roleInputs.forEach(input => {
+        input.addEventListener('change', function() {
+            // Remove selected state from all cards
+            roleCards.forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Add selected state to current card
+            if (this.checked) {
+                const card = this.nextElementSibling;
+                card.classList.add('selected');
+                
+                // Add visual feedback
+                card.style.animation = 'pulse 0.3s ease';
+                setTimeout(() => {
+                    card.style.animation = '';
+                }, 300);
+                
+                // Optional: Trigger custom event
+                const event = new CustomEvent('roleSelected', {
+                    detail: { role: this.value }
+                });
+                document.dispatchEvent(event);
+            }
+        });
+    });
+    
+    // Auto-select default role
+    const defaultRole = document.getElementById('role-staff-enhanced');
+    if (defaultRole) {
+        defaultRole.checked = true;
+        defaultRole.nextElementSibling.classList.add('selected');
+    }
+    
+    // Keyboard navigation support
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+            const currentIndex = Array.from(roleInputs).findIndex(input => input.checked);
+            if (currentIndex !== -1) {
+                let newIndex;
+                if (e.key === 'ArrowRight') {
+                    newIndex = (currentIndex + 1) % roleInputs.length;
+                } else {
+                    newIndex = (currentIndex - 1 + roleInputs.length) % roleInputs.length;
+                }
+                roleInputs[newIndex].click();
+                e.preventDefault();
+            }
+        }
+    });
+});
+</script>

@@ -368,23 +368,21 @@
                 </div>
             </div>
 
-            <!-- 4. ĐÁNH GIÁ KHÓA HỌC ─── NGUYÊN BẢN USER ─── -->
+            <!-- 4. ĐÁNH GIÁ KHÓA HỌC ─── CHO PHÉP XEM KHÔNG CẦN ĐĂNG NHẬP ─── -->
             <div class="section-card">
                 <h4><i class="bi bi-star-fill" style="color:var(--accent)"></i>Đánh giá khóa học</h4>
 
-                {% if user.is_authenticated %}
+                {% if average_rating %}
+                <div style="font-size:22px;font-weight:600;margin-bottom:10px;">
+                    {{ average_rating }} ⭐
+                    <span style="font-size:14px;color:#64748b">
+                        ({{ reviews.count }} đánh giá)
+                    </span>
+                </div>
+                {% endif %}
 
-                    {% if average_rating %}
-                    <div style="font-size:22px;font-weight:600;margin-bottom:10px;">
-                        {{ average_rating }} ⭐
-                        <span style="font-size:14px;color:#64748b">
-                            ({{ reviews.count }} đánh giá)
-                        </span>
-                    </div>
-                    {% endif %}
-
-                    <!-- Danh sách review -->
-                    {% for review in reviews %}
+                <!-- Danh sách review - HIỂN THỊ VỚI TẤT CẢ NGƯỜI DÙNG -->
+                {% for review in reviews %}
     <div class="review-card">
         <strong>{{ review.user.username }}</strong>
 
@@ -403,7 +401,7 @@
         </small>
 
         <p style="margin-top:8px;">{{ review.comment }}</p>
-        
+
         <!--🔥 ẢNH ĐÍNH KÈM ĐÁNH GIÁ -->
         {% if review.image %}
         <div style="margin-top:12px;">
@@ -416,7 +414,7 @@
             </div>
         </div>
         {% endif %}
-        
+
         <!-- 🔥 PHẦN ADMIN REPLY -->
         {% if review.admin_reply %}
         <div style="
@@ -434,9 +432,9 @@
     </div>
 {% endfor %}
 
+                {% if user.is_authenticated %}
                     <hr>
-
-                    <!-- FORM REVIEW -->
+                    <!-- FORM REVIEW - CHỈ HIỂN THỊ KHI ĐÃ ĐĂNG NHẬP -->
                     <form method="POST" action="{% url 'courses:add_review' course.pk %}" enctype="multipart/form-data">
                         {% csrf_token %}
                         <label>Đánh giá sao:</label>
@@ -450,7 +448,7 @@
                         </select>
                         <textarea name="comment" class="form-control mb-2"
                                   placeholder="Viết nhận xét của bạn..." required></textarea>
-                                            
+                        
                         <!-- Trường tải ảnh -->
                         <div class="mb-2">
                             <label class="form-label" style="font-size:.87rem;color:#334155;">Ảnh đính kèm (tùy chọn):</label>
@@ -462,15 +460,15 @@
                                 Định dạng: JPG, PNG, GIF, WEBP. Tối đa 3MB.
                             </div>
                         </div>
-                                            
+                        
                         <button class="btn btn-warning">Gửi đánh giá</button>
                     </form>
-
                 {% else %}
-                    <div style="padding:20px;background:#f8fafc;border-radius:10px;">
-                        <p>Bạn cần đăng nhập để xem và gửi đánh giá.</p>
+                    <hr>
+                    <div style="padding:20px;background:#f8fafc;border-radius:10px;text-align:center;">
+                        <p><i class="bi bi-lock me-2"></i>Bạn cần đăng nhập để gửi đánh giá của mình.</p>
                         <a href="{% url 'login' %}" class="btn btn-dark">
-                            Đăng nhập ngay
+                            <i class="bi bi-box-arrow-in-right me-2"></i>Đăng nhập để đánh giá
                         </a>
                     </div>
                 {% endif %}

@@ -32,4 +32,9 @@ urlpatterns = [
     path('<int:pk>/edit/', views.edit_course, name='edit_course'),
     path('<int:pk>/delete/', views.delete_course, name='delete_course'),
     
+    # Quản lý nhân viên
+    path('staff/dashboard/', views.staff_dashboard, name='staff_dashboard'),
+    path('staff/management/', views.staff_management, name='staff_management'),
+    path('staff/create/', views.create_staff, name='create_staff'),
+    
 ]

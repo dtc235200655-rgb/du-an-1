@@ -25,37 +25,58 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="/">Home</a>
+                        <a class="nav-link" href="/">Trang chủ</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/courses/">Courses</a>
+                        <a class="nav-link" href="/courses/">Khóa học</a>
                     </li>
                     
                     {% if user.is_authenticated %}
                         <!-- Hiển thị khi ĐÃ đăng nhập -->
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'courses:dashboard' %}">
-                                <i class="bi bi-speedometer2 me-1"></i>Dashboard
-                            </a>
-                        </li>
+                        {% if user.user_role and user.user_role.role == 'admin' %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="/admin/">
+                                    <i class="bi bi-shield-lock me-1"></i>Admin Panel
+                                </a>
+                            </li>
+                        {% elif user.user_role and user.user_role.role == 'staff' %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="/staff/dashboard/">
+                                    <i class="bi bi-person-workspace me-1"></i>Staff Dashboard
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'courses:dashboard' %}">
+                                    <i class="bi bi-speedometer2 me-1"></i>Dashboard
+                                </a>
+                            </li>
+                        {% endif %}
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                                 <i class="bi bi-person-circle"></i> {{ user.username }}
+                                {% if user.user_role %}
+                                    <span class="badge {{ user.user_role.get_role_badge_class }} ms-1">{{ user.user_role.get_role_display }}</span>
+                                {% endif %}
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="{% url 'courses:dashboard' %}"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a></li>
-                                <li><a class="dropdown-item" href="/courses/my-courses/"><i class="bi bi-book me-2"></i>My Courses</a></li>
+                                <li><a class="dropdown-item" href="{% url 'courses:dashboard' %}"><i class="bi bi-speedometer2 me-2"></i>Bảng điều khiển</a></li>
+                                <li><a class="dropdown-item" href="/courses/my-courses/"><i class="bi bi-book me-2"></i>Khóa học của tôi</a></li>
+                                {% if user.user_role and user.user_role.role == 'staff' %}
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="/staff/dashboard/"><i class="bi bi-person-workspace me-2"></i>Bảng điều khiển Nhân viên</a></li>
+                                {% endif %}
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item text-danger" href="/logout/"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+                                <li><a class="dropdown-item text-danger" href="/logout/"><i class="bi bi-box-arrow-right me-2"></i>Đăng xuất</a></li>
                             </ul>
                         </li>
                     {% else %}
                         <!-- Hiển thị khi CHƯA đăng nhập -->
                         <li class="nav-item">
-                            <a class="nav-link" href="/login/">Login</a>
+                            <a class="nav-link" href="/login/">Đăng nhập</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/register/">Register</a>
+                            <a class="nav-link" href="/register/">Đăng ký</a>
                         </li>
                     {% endif %}
                 </ul>
@@ -82,7 +103,7 @@
     <!-- ========== FOOTER ========== -->
     <footer class="bg-dark text-white py-4 mt-5">
         <div class="container text-center">
-            <p class="mb-0">&copy; 2024 Online Courses. All rights reserved.</p>
+            <p class="mb-0">&copy; 2024 Online Courses. Bảo lưu mọi quyền.</p>
         </div>
     </footer>
     <!-- ========== END FOOTER ========== -->

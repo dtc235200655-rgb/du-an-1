@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Role Selection - Professional</title>
+    <!-- Bootstrap 5 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --admin-gradient: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            --staff-gradient: linear-gradient(135deg, #4361ee 0%, #3f37c9 100%);
+            --customer-gradient: linear-gradient(135deg, #06d6a0 0%, #118ab2 100%);
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            --card-hover-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+            --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8f9fa;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .role-selection-container {
+            width: 100%;
+            max-width: 900px;
+            background: white;
+            border-radius: 25px;
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+        }
+
+        /* ========== HEADER ========== */
+        .selection-header {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 2.5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .selection-header::before {
+            content: "";
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .selection-header::after {
+            content: "";
+            position: absolute;
+            bottom: -80px;
+            left: -30px;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .header-content h2 {
+            font-weight: 700;
+            font-size: 2.2rem;
+            margin-bottom: 1rem;
+            letter-spacing: -0.5px;
+        }
+
+        .header-content p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            font-weight: 400;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* ========== ROLE CARDS SECTION ========== */
+        .roles-section {
+            padding: 3rem;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .section-title h3 {
+            color: #2c3e50;
+            font-weight: 600;
+            font-size: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .section-title p {
+            color: #7f8c8d;
+            font-size: 1.05rem;
+        }
+
+        .roles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2.5rem;
+        }
+
+        /* ========== ROLE CARD ========== */
+        .role-card {
+            position: relative;
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 3px solid transparent;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        .role-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+
+        .role-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: var(--card-hover-shadow);
+        }
+
+        .role-card:hover::before {
+            transform: translateX(100%);
+        }
+
+        .role-card.selected {
+            border-color: #4361ee;
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2), var(--card-hover-shadow);
+            transform: translateY(-5px) scale(1.03);
+        }
+
+        .role-card.selected::after {
+            content: "";
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 25px;
+            height: 25px;
+            background: #4361ee;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.8rem;
+        }
+
+        .role-card.selected::after {
+            content: "✓";
+        }
+
+        /* ========== ROLE ICON ========== */
+        .role-icon {
+            width: 90px;
+            height: 90px;
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2.5rem;
+            color: white;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            transition: var(--transition);
+        }
+
+        .role-card:hover .role-icon {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3);
+        }
+
+        .role-icon.admin {
+            background: var(--admin-gradient);
+        }
+
+        .role-icon.staff {
+            background: var(--staff-gradient);
+        }
+
+        .role-icon.customer {
+            background: var(--customer-gradient);
+        }
+
+        /* ========== ROLE INFO ========== */
+        .role-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 0.75rem;
+            transition: var(--transition);
+        }
+
+        .role-description {
+            color: #7f8c8d;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            min-height: 60px;
+        }
+
+        .role-features {
+            text-align: left;
+            margin-bottom: 1.5rem;
+        }
+
+        .role-features li {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.75rem;
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        .role-features li i {
+            color: #4361ee;
+            margin-right: 0.75rem;
+            font-size: 1.1rem;
+            width: 20px;
+        }
+
+        .role-badge {
+            display: inline-block;
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-admin {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+            color: white;
+        }
+
+        .badge-staff {
+            background: linear-gradient(135deg, #4361ee, #3f37c9);
+            color: white;
+        }
+
+        .badge-customer {
+            background: linear-gradient(135deg, #06d6a0, #118ab2);
+            color: white;
+        }
+
+        /* ========== HIDDEN INPUT ========== */
+        .role-input {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        /* ========== ACTION BUTTON ========== */
+        .action-section {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid #eee;
+        }
+
+        .btn-continue {
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            padding: 1.1rem 2.5rem;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .btn-continue:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(102, 126, 234, 0.6);
+        }
+
+        .btn-continue:active {
+            transform: translateY(0);
+        }
+
+        .btn-continue:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* ========== PROGRESS INDICATOR ========== */
+        .progress-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .progress-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #e0e0e0;
+            transition: var(--transition);
+        }
+
+        .progress-dot.active {
+            background: #4361ee;
+            transform: scale(1.2);
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 768px) {
+            .roles-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            
+            .role-card {
+                padding: 1.5rem;
+            }
+            
+            .role-icon {
+                width: 70px;
+                height: 70px;
+                font-size: 2rem;
+            }
+            
+            .roles-section {
+                padding: 2rem 1.5rem;
+            }
+            
+            .selection-header {
+                padding: 2rem 1.5rem;
+            }
+            
+            .header-content h2 {
+                font-size: 1.8rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .role-selection-container {
+                border-radius: 15px;
+            }
+            
+            .roles-section {
+                padding: 1.5rem;
+            }
+            
+            .selection-header {
+                padding: 1.5rem;
+            }
+            
+            .role-features {
+                text-align: center;
+            }
+            
+            .role-features li {
+                justify-content: center;
+            }
+        }
+
+        /* ========== ANIMATION KEYFRAMES ========== */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .role-card {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        .role-card:nth-child(1) { animation-delay: 0.1s; }
+        .role-card:nth-child(2) { animation-delay: 0.2s; }
+        .role-card:nth-child(3) { animation-delay: 0.3s; }
+    </style>
+</head>
+<body>
+    <div class="role-selection-container">
+        <!-- ========== HEADER ========== -->
+        <div class="selection-header">
+            <div class="header-content">
+                <h2><i class="bi bi-person-badge me-3"></i>Chọn vai trò của bạn</h2>
+                <p>Vui lòng chọn vai trò phù hợp để hệ thống cung cấp trải nghiệm tối ưu nhất cho bạn</p>
+            </div>
+        </div>
+
+        <!-- ========== ROLES SECTION ========== -->
+        <div class="roles-section">
+            <div class="section-title">
+                <h3><i class="bi bi-grid-3x3-gap me-2"></i>Chọn vai trò đăng nhập</h3>
+                <p>Mỗi vai trò có quyền truy cập và tính năng khác nhau</p>
+            </div>
+
+            <!-- Progress Indicator -->
+            <div class="progress-indicator">
+                <div class="progress-dot active"></div>
+                <div class="progress-dot"></div>
+                <div class="progress-dot"></div>
+            </div>
+
+            <!-- Role Cards Grid -->
+            <div class="roles-grid">
+                <!-- ADMIN CARD -->
+                <div class="role-card">
+                    <input type="radio" name="role" id="role-admin" value="admin" class="role-input">
+                    <label for="role-admin" class="role-content">
+                        <div class="role-icon admin">
+                            <i class="bi bi-shield-lock"></i>
+                        </div>
+                        <h3 class="role-title">Quản trị viên</h3>
+                        <p class="role-description">
+                            Toàn quyền quản lý hệ thống, người dùng và nội dung
+                        </p>
+                        <ul class="role-features">
+                            <li><i class="bi bi-check-circle"></i>Quản lý toàn hệ thống</li>
+                            <li><i class="bi bi-check-circle"></i>Quản lý người dùng</li>
+                            <li><i class="bi bi-check-circle"></i>Thống kê & báo cáo</li>
+                            <li><i class="bi bi-check-circle"></i>Cấu hình hệ thống</li>
+                        </ul>
+                        <span class="role-badge badge-admin">Admin</span>
+                    </label>
+                </div>
+
+                <!-- STAFF CARD -->
+                <div class="role-card">
+                    <input type="radio" name="role" id="role-staff" value="staff" class="role-input" checked>
+                    <label for="role-staff" class="role-content">
+                        <div class="role-icon staff">
+                            <i class="bi bi-person-workspace"></i>
+                        </div>
+                        <h3 class="role-title">Nhân viên</h3>
+                        <p class="role-description">
+                            Quản lý khóa học, đăng ký và đánh giá của học viên
+                        </p>
+                        <ul class="role-features">
+                            <li><i class="bi bi-check-circle"></i>Quản lý khóa học</li>
+                            <li><i class="bi bi-check-circle"></i>Duyệt đăng ký học</li>
+                            <li><i class="bi bi-check-circle"></i>Quản lý đánh giá</li>
+                            <li><i class="bi bi-check-circle"></i>Thống kê hoạt động</li>
+                        </ul>
+                        <span class="role-badge badge-staff">Staff</span>
+                    </label>
+                </div>
+
+                <!-- CUSTOMER CARD -->
+                <div class="role-card">
+                    <input type="radio" name="role" id="role-customer" value="customer" class="role-input">
+                    <label for="role-customer" class="role-content">
+                        <div class="role-icon customer">
+                            <i class="bi bi-person"></i>
+                        </div>
+                        <h3 class="role-title">Khách hàng</h3>
+                        <p class="role-description">
+                            Học tập, đăng ký khóa học và đánh giá trải nghiệm
+                        </p>
+                        <ul class="role-features">
+                            <li><i class="bi bi-check-circle"></i>Duyệt khóa học</li>
+                            <li><i class="bi bi-check-circle"></i>Đăng ký học trực tuyến</li>
+                            <li><i class="bi bi-check-circle"></i>Đánh giá & phản hồi</li>
+                            <li><i class="bi bi-check-circle"></i>Theo dõi tiến độ</li>
+                        </ul>
+                        <span class="role-badge badge-customer">Customer</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Action Section -->
+            <div class="action-section">
+                <button type="button" class="btn-continue" id="continueBtn" disabled>
+                    <i class="bi bi-arrow-right-circle"></i>
+                    <span>Tiếp tục đăng nhập</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Role selection logic
+        document.addEventListener('DOMContentLoaded', function() {
+            const roleInputs = document.querySelectorAll('.role-input');
+            const roleCards = document.querySelectorAll('.role-card');
+            const continueBtn = document.getElementById('continueBtn');
+            const progressDots = document.querySelectorAll('.progress-dot');
+
+            // Handle role selection
+            roleInputs.forEach((input, index) => {
+                input.addEventListener('change', function() {
+                    // Remove selected class from all cards
+                    roleCards.forEach(card => {
+                        card.classList.remove('selected');
+                    });
+                    
+                    // Add selected class to current card
+                    if (this.checked) {
+                        this.closest('.role-card').classList.add('selected');
+                        
+                        // Update progress indicator
+                        progressDots.forEach(dot => dot.classList.remove('active'));
+                        progressDots[index].classList.add('active');
+                        
+                        // Enable continue button
+                        continueBtn.disabled = false;
+                        continueBtn.innerHTML = `
+                            <i class="bi bi-arrow-right-circle"></i>
+                            <span>Tiếp tục với vai trò ${this.closest('.role-card').querySelector('.role-title').textContent}</span>
+                        `;
+                    }
+                });
+            });
+
+            // Handle continue button click
+            continueBtn.addEventListener('click', function() {
+                if (!this.disabled) {
+                    const selectedRole = document.querySelector('.role-input:checked');
+                    if (selectedRole) {
+                        // Here you would typically submit the form or redirect
+                        // For demo purposes, we'll show an alert
+                        alert(`Bạn đã chọn vai trò: ${selectedRole.value}\nTiếp tục với quy trình đăng nhập...`);
+                        
+                        // Add animation effect
+                        this.innerHTML = '<i class="bi bi-arrow-repeat"></i> <span>Đang xử lý...</span>';
+                        this.disabled = true;
+                        
+                        // Simulate processing
+                        setTimeout(() => {
+                            // Redirect or submit form here
+                            // window.location.href = '/login?role=' + selectedRole.value;
+                        }, 1500);
+                    }
+                }
+            });
+
+            // Auto-select first role (staff) on page load
+            const defaultRole = document.getElementById('role-staff');
+            if (defaultRole) {
+                defaultRole.checked = true;
+                defaultRole.closest('.role-card').classList.add('selected');
+                continueBtn.disabled = false;
+                continueBtn.innerHTML = `
+                    <i class="bi bi-arrow-right-circle"></i>
+                    <span>Tiếp tục với vai trò Nhân viên</span>
+                `;
+                progressDots[1].classList.add('active');
+            }
+
+            // Add keyboard navigation
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !continueBtn.disabled) {
+                    continueBtn.click();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

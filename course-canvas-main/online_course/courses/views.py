@@ -1,9 +1,10 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from django.db.models import Avg, Count, Q
 from django.core.paginator import Paginator
-from .models import Course, Enrollment, Review, Category
+from django.contrib.auth.models import User, Group
+from .models import Course, Enrollment, Review, Category, StaffProfile
 from .forms import CourseCreateForm, CourseUpdateForm
 from .utils import validate_image_file
 
@@ -290,6 +291,51 @@ def dashboard(request):
     })
 
 
+# =========== HÀM HỖ TRỢ CHO NHÂN VIÊN ===========
+
+def is_staff_member(user):
+    """Kiểm tra user có phải là nhân viên không"""
+    return user.is_authenticated and (
+        user.is_staff or 
+        hasattr(user, 'staff_profile') and user.staff_profile.is_active
+    )
+
+def is_super_staff(user):
+    """Kiểm tra user có phải là nhân viên cấp cao không"""
+    return (
+        is_staff_member(user) and 
+        hasattr(user, 'staff_profile') and 
+        user.staff_profile.role == 'super_staff'
+    )
+
+def has_course_permission(user):
+    """Kiểm tra user có quyền quản lý khóa học"""
+    return (
+        user.is_staff or 
+        (hasattr(user, 'staff_profile') and 
+         user.staff_profile.role in ['course_manager', 'super_staff']) or
+        user.has_perm('courses.can_manage_courses')
+    )
+
+def has_enrollment_permission(user):
+    """Kiểm tra user có quyền quản lý đăng ký học"""
+    return (
+        user.is_staff or 
+        (hasattr(user, 'staff_profile') and 
+         user.staff_profile.role in ['enrollment_manager', 'super_staff']) or
+        user.has_perm('courses.can_manage_enrollments')
+    )
+
+def has_review_permission(user):
+    """Kiểm tra user có quyền quản lý đánh giá"""
+    return (
+        user.is_staff or 
+        (hasattr(user, 'staff_profile') and 
+         user.staff_profile.role in ['review_manager', 'super_staff']) or
+        user.has_perm('courses.can_manage_reviews')
+    )
+
+
 # =========== COURSE MANAGEMENT VIEWS ===========
 
 @login_required
@@ -365,3 +411,149 @@ def delete_course(request, pk):
         return redirect('courses:dashboard')
     
     return render(request, 'courses/delete_course.html', {'course': course})
+
+
+# =========== STAFF MANAGEMENT VIEWS ===========
+
+@user_passes_test(is_staff_member, login_url='/login/')
+def staff_dashboard(request):
+    """Dashboard cho nhân viên"""
+    user = request.user
+    
+    # Thống kê cơ bản
+    stats = {
+        'total_courses': Course.objects.count(),
+        'pending_courses': Course.objects.filter(status='pending').count(),
+        'total_enrollments': Enrollment.objects.count(),
+        'pending_enrollments': Enrollment.objects.filter(status='pending').count(),
+        'total_reviews': Review.objects.count(),
+        'total_users': User.objects.count(),
+    }
+    
+    # Lấy dữ liệu theo vai trò
+    recent_courses = []
+    recent_enrollments = []
+    recent_reviews = []
+    
+    if has_course_permission(user):
+        recent_courses = Course.objects.filter(status='pending').order_by('-created_at')[:5]
+    
+    if has_enrollment_permission(user):
+        recent_enrollments = Enrollment.objects.filter(status='pending').order_by('-created_at')[:5]
+    
+    if has_review_permission(user):
+        recent_reviews = Review.objects.filter(is_visible=True).order_by('-created_at')[:5]
+    
+    context = {
+        'stats': stats,
+        'recent_courses': recent_courses,
+        'recent_enrollments': recent_enrollments,
+        'recent_reviews': recent_reviews,
+        'is_super_staff': is_super_staff(user),
+        'has_course_perm': has_course_permission(user),
+        'has_enrollment_perm': has_enrollment_permission(user),
+        'has_review_perm': has_review_permission(user),
+    }
+    
+    return render(request, 'courses/staff_dashboard.html', context)
+
+
+@user_passes_test(is_super_staff, login_url='/login/')
+def staff_management(request):
+    """Quản lý nhân viên (chỉ dành cho nhân viên cấp cao)"""
+    staff_profiles = StaffProfile.objects.select_related('user').all()
+    
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        profile_id = request.POST.get('profile_id')
+        
+        try:
+            profile = StaffProfile.objects.get(id=profile_id)
+            
+            if action == 'activate':
+                profile.is_active = True
+                profile.save()
+                messages.success(request, f'Đã kích hoạt nhân viên {profile.user.username}')
+            elif action == 'deactivate':
+                profile.is_active = False
+                profile.save()
+                messages.success(request, f'Đã vô hiệu hóa nhân viên {profile.user.username}')
+            elif action == 'delete':
+                username = profile.user.username
+                profile.user.delete()  # Xóa cả User và StaffProfile
+                messages.success(request, f'Đã xóa nhân viên {username}')
+                
+        except StaffProfile.DoesNotExist:
+            messages.error(request, 'Nhân viên không tồn tại')
+        except Exception as e:
+            messages.error(request, f'Lỗi: {str(e)}')
+        
+        return redirect('courses:staff_management')
+    
+    context = {
+        'staff_profiles': staff_profiles
+    }
+    
+    return render(request, 'courses/staff_management.html', context)
+
+
+@user_passes_test(is_super_staff, login_url='/login/')
+def create_staff(request):
+    """Tạo nhân viên mới (chỉ dành cho nhân viên cấp cao)"""
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        role = request.POST.get('role')
+        phone = request.POST.get('phone', '')
+        department = request.POST.get('department', '')
+        
+        # Validate
+        if not all([username, email, password, role]):
+            messages.error(request, 'Vui lòng điền đầy đủ thông tin bắt buộc')
+            return render(request, 'courses/create_staff.html', {
+                'roles': StaffProfile.ROLE_CHOICES
+            })
+        
+        if User.objects.filter(username=username).exists():
+            messages.error(request, 'Tên đăng nhập đã tồn tại')
+            return render(request, 'courses/create_staff.html', {
+                'roles': StaffProfile.ROLE_CHOICES
+            })
+        
+        if User.objects.filter(email=email).exists():
+            messages.error(request, 'Email đã được sử dụng')
+            return render(request, 'courses/create_staff.html', {
+                'roles': StaffProfile.ROLE_CHOICES
+            })
+        
+        try:
+            # Tạo user
+            user = User.objects.create_user(
+                username=username,
+                email=email,
+                password=password
+            )
+            
+            # Tạo staff profile
+            StaffProfile.objects.create(
+                user=user,
+                role=role,
+                phone=phone,
+                department=department
+            )
+            
+            # Gán vào nhóm tương ứng
+            group_name = dict(StaffProfile.ROLE_CHOICES)[role]
+            group = Group.objects.get(name=group_name)
+            user.groups.add(group)
+            
+            messages.success(request, f'Tạo nhân viên {username} thành công!')
+            return redirect('courses:staff_management')
+            
+        except Exception as e:
+            messages.error(request, f'Lỗi tạo nhân viên: {str(e)}')
+    
+    return render(request, 'courses/create_staff.html', {
+        'roles': StaffProfile.ROLE_CHOICES
+    })
