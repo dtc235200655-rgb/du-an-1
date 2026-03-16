@@ -32,6 +32,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'courses',
+    'crypto_bot',  # ✅ NEW: Crypto Bot app
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

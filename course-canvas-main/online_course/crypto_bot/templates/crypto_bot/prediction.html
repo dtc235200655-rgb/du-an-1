@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+
+{% block title %}Dự đoán {{ crypto_name }} - 60 Ngày Tới{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <!-- Back Button -->
+    <div class="mb-4">
+        <a href="{% url 'crypto_bot:home' %}" class="btn btn-outline-primary">
+            <i class="bi bi-arrow-left me-2"></i>Quay lại
+        </a>
+    </div>
+
+    {% if result.success %}
+        <!-- Prediction Header -->
+        <div class="card shadow-lg border-0 mb-4">
+            <div class="card-header bg-primary text-white text-center py-4">
+                <h2 class="mb-0 fw-bold">
+                    <i class="bi bi-graph-up-arrow me-2"></i>
+                    Dự Đoán {{ crypto_name }}
+                </h2>
+                <p class="mb-0 mt-2">60 ngày tới</p>
+            </div>
+            
+            <div class="card-body">
+                <!-- Key Metrics -->
+                <div class="row text-center mb-4">
+                    <div class="col-md-4 mb-3">
+                        <div class="p-3 bg-light rounded">
+                            <h6 class="text-muted">Giá Hiện Tại</h6>
+                            <h3 class="fw-bold text-primary">
+                                ${{ result.current_price|floatformat:2 }}
+                            </h3>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4 mb-3">
+                        <div class="p-3 bg-light rounded">
+                            <h6 class="text-muted">Giá Dự Báo</h6>
+                            <h3 class="fw-bold text-success">
+                                ${{ result.predicted_price|floatformat:2 }}
+                            </h3>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4 mb-3">
+                        <div class="p-3 bg-light rounded">
+                            <h6 class="text-muted">Xu Hướng</h6>
+                            <h3 class="fw-bold {% if result.trend == 'Tăng' %}text-success{% else %}text-danger{% endif %}">
+                                {{ result.trend_icon }} {{ result.trend }} {{ result.change_percent|floatformat:2 }}%
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chart -->
+                <div class="text-center">
+                    <img src="{{ result.chart_url }}" 
+                         alt="Biểu đồ dự đoán {{ symbol }}" 
+                         class="img-fluid rounded shadow-sm"
+                         style="max-width: 100%; height: auto;">
+                </div>
+
+                <!-- Analysis Info -->
+                <div class="alert alert-info mt-4" role="alert">
+                    <div class="d-flex">
+                        <div class="me-3">
+                            <i class="bi bi-bar-chart-line display-6"></i>
+                        </div>
+                        <div>
+                            <h5 class="alert-heading">Phân Tích Kỹ Thuật</h5>
+                            <p class="mb-0">
+                                Biểu đồ sử dụng <strong>nến Nhật (Candlestick)</strong> với đường trung bình động <strong>MA20</strong> (cam). 
+                                Dữ liệu được phân tích trong 180 ngày qua và dự báo 60 ngày tới.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="text-center">
+            <button onclick="window.location.reload()" class="btn btn-primary btn-lg me-2">
+                <i class="bi bi-arrow-clockwise me-2"></i>Làm Mới Dự Đoán
+            </button>
+            <a href="{% url 'crypto_bot:home' %}" class="btn btn-outline-secondary btn-lg">
+                <i class="bi bi-house me-2"></i>Về Trang Chủ
+            </a>
+        </div>
+
+    {% else %}
+        <!-- Error State -->
+        <div class="alert alert-danger" role="alert">
+            <h4 class="alert-heading">
+                <i class="bi bi-exclamation-triangle me-2"></i>Lỗi
+            </h4>
+            <p>{{ result.error }}</p>
+            <hr>
+            <button onclick="window.location.reload()" class="btn btn-danger">
+                <i class="bi bi-arrow-clockwise me-2"></i>Thử Lại
+            </button>
+        </div>
+    {% endif %}
+
+    <!-- Disclaimer -->
+    <div class="alert alert-warning mt-5" role="alert">
+        <div class="d-flex">
+            <div class="me-3">
+                <i class="bi bi-info-circle display-6"></i>
+            </div>
+            <div>
+                <h5 class="alert-heading">⚠️ Tuyên Bố Miễn Trừ Trách Nhiệm</h5>
+                <p class="mb-0">
+                    Kết quả dự đoán chỉ mang tính chất <strong>tham khảo</strong>. 
+                    Thị trường cryptocurrency rất biến động và rủi ro cao. 
+                    Vui lòng nghiên cứu kỹ lưỡng trước khi đưa ra quyết định đầu tư.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Auto-refresh option (optional)
+    console.log('Prediction loaded for {{ symbol }}');
+</script>
+{% endblock %}

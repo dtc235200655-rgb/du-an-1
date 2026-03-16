@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+
+{% block title %}Crypto Bot - Dự đoán giá Bitcoin & Ethereum{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <!-- Header -->
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold text-primary">
+            <i class="bi bi-robot me-2"></i>Crypto AI Forecast
+        </h1>
+        <p class="lead text-muted">
+            🤖 Dự báo xu hướng giá 60 ngày tới sử dụng mô hình <strong>BI-LSTM</strong> và <strong>Recursive Forecasting</strong>
+        </p>
+        <span class="badge bg-warning text-dark">MỚI - THỬ NGHIỆM</span>
+    </div>
+
+    <!-- Crypto Cards -->
+    <div class="row g-4 justify-content-center">
+        <!-- BTC Card -->
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow-lg border-0 h-100">
+                <div class="card-header bg-warning text-dark text-center py-3">
+                    <h3 class="mb-0 fw-bold">
+                        <i class="bi bi-currency-bitcoin me-2"></i>Bitcoin (BTC)
+                    </h3>
+                </div>
+                <div class="card-body text-center">
+                    <img src="https://cryptologos.cc/logos/bitcoin-btc-logo.png" 
+                         alt="Bitcoin" 
+                         class="img-fluid mb-4" 
+                         style="max-width: 150px;">
+                    
+                    <p class="card-text text-muted mb-4">
+                        Dự đoán giá BTC trong 60 ngày tới với phân tích kỹ thuật AI
+                    </p>
+                    
+                    <a href="{% url 'crypto_bot:btc_prediction' %}" 
+                       class="btn btn-warning btn-lg px-4 py-3 fw-bold">
+                        <i class="bi bi-graph-up-arrow me-2"></i>Xem Dự Đoán BTC
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ETH Card -->
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow-lg border-0 h-100">
+                <div class="card-header bg-primary text-white text-center py-3">
+                    <h3 class="mb-0 fw-bold">
+                        <i class="bi bi-diamond-half me-2"></i>Ethereum (ETH)
+                    </h3>
+                </div>
+                <div class="card-body text-center">
+                    <img src="https://cryptologos.cc/logos/ethereum-eth-logo.png" 
+                         alt="Ethereum" 
+                         class="img-fluid mb-4" 
+                         style="max-width: 150px;">
+                    
+                    <p class="card-text text-muted mb-4">
+                        Dự đoán giá ETH trong 60 ngày tới với phân tích kỹ thuật AI
+                    </p>
+                    
+                    <a href="{% url 'crypto_bot:eth_prediction' %}" 
+                       class="btn btn-primary btn-lg px-4 py-3 fw-bold">
+                        <i class="bi bi-graph-up-arrow me-2"></i>Xem Dự Đoán ETH
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <h2 class="text-center mb-4">Tính Năng Nổi Bật</h2>
+        </div>
+        
+        <div class="col-md-4 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-cpu display-4 text-primary mb-3"></i>
+                    <h5 class="card-title">AI Model BI-LSTM</h5>
+                    <p class="card-text">
+                        Sử dụng mô hình học sâu Bidirectional LSTM tiên tiến để phân tích chuỗi thời gian
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-graph-up display-4 text-success mb-3"></i>
+                    <h5 class="card-title">Dự Báo 60 Ngày</h5>
+                    <p class="card-text">
+                        Dự đoán xu hướng giá trong 60 ngày tiếp theo với độ chính xác cao
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-pie-chart display-4 text-warning mb-3"></i>
+                    <h5 class="card-title">Biểu Đồ Chi Tiết</h5>
+                    <p class="card-text">
+                        Hiển thị biểu đồ nến Nhật với các chỉ báo kỹ thuật RSI, MA20
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Info Alert -->
+    <div class="alert alert-info mt-5" role="alert">
+        <div class="d-flex">
+            <div class="me-3">
+                <i class="bi bi-info-circle display-6"></i>
+            </div>
+            <div>
+                <h5 class="alert-heading">⚠️ Lưu ý quan trọng</h5>
+                <p class="mb-0">
+                    Đây là tính năng <strong>thử nghiệm</strong>. Các dự đoán chỉ mang tính chất tham khảo và không nên được sử dụng làm cơ sở duy nhất cho các quyết định đầu tư. 
+                    Hãy luôn nghiên cứu kỹ lưỡng trước khi đầu tư vào cryptocurrency.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

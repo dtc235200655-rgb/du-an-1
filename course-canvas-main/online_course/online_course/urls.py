@@ -8,6 +8,7 @@ from courses import views as course_views
 urlpatterns = [
     path('', views.home, name='home'),
     path('courses/', include('courses.urls')),
+    path('crypto/', include('crypto_bot.urls')),  # ✅ NEW: Crypto Bot feature
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
     path('register/', views.register_view, name='register'),
